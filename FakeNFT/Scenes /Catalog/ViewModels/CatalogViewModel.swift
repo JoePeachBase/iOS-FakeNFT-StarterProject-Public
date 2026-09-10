@@ -26,6 +26,7 @@ final class CatalogViewModel {
     }
     
     private let collectionService: CollectionService
+    private let sortOptionKey = "catalogSortOption"
     
     private(set) var state: CatalogState = .initial {
         didSet {
@@ -41,11 +42,18 @@ final class CatalogViewModel {
         state = .loading
         
         collectionService.loadCollections { [weak self] result in
+            guard let self else { return }
             switch result {
             case .success(let collections):
-                self?.state = .loaded(collections)
+                if let sortOption = self.loadSortOption() {
+                    let sortedCollections = self.sortedCollections(collections, by: sortOption)
+                    self.state = .loaded(sortedCollections)
+                } else {
+                    self.state = .loaded(collections)
+                }
+                
             case .failure(let error):
-                self?.state = .failed(error)
+                self.state = .failed(error)
             }
         }
     }
@@ -85,14 +93,27 @@ final class CatalogViewModel {
     
     func sort(by option: CatalogSortOption) {
         guard case .loaded(let collections) = state else { return }
-        
+
+        let sortedCollections = sortedCollections(collections, by: option)
+        saveSortOption(option)
+        state = .loaded(sortedCollections)
+    }
+    
+    private func saveSortOption(_ option: CatalogSortOption) {
+        UserDefaults.standard.set(option.rawValue, forKey: sortOptionKey)
+    }
+    
+    private func loadSortOption() -> CatalogSortOption? {
+        guard let rawValue = UserDefaults.standard.string(forKey: sortOptionKey) else { return nil }
+        return CatalogSortOption.init(rawValue: rawValue)
+    }
+    
+    private func sortedCollections(_ collections: [NFTCollection], by option: CatalogSortOption) -> [NFTCollection] {
         switch option {
         case .name:
-            let sortedCollections = collections.sorted { $0.name < $1.name }
-            state = .loaded(sortedCollections)
+            collections.sorted { $0.name < $1.name }
         case .nftCount:
-            let sortedCollections = collections.sorted { $0.nftCount > $1.nftCount }
-            state = .loaded(sortedCollections)
+            collections.sorted { $0.nftCount > $1.nftCount }
         }
     }
 }

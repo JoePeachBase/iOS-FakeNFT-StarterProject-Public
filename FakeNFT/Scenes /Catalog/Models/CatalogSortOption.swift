@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum CatalogSortOption {
+enum CatalogSortOption: String {
     case name
     case nftCount
 }
