@@ -14,6 +14,7 @@ final class CatalogViewController: UIViewController {
         let tableView = UITableView()
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.dataSource = self
+        tableView.register(CatalogCell.self, forCellReuseIdentifier: CatalogCell.reuseIdentifier)
         return tableView
     }()
     
@@ -68,13 +69,14 @@ extension CatalogViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "cell")
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: CatalogCell.reuseIdentifier) as? CatalogCell else { return UITableViewCell()}
         
-        guard let collection = viewModel.collection(at: indexPath.row) else {
+        guard let cellModel = viewModel.cellModel(at: indexPath.row) else {
             return UITableViewCell()
         }
-        cell.textLabel?.text = collection.name
-        cell.detailTextLabel?.text = "\(collection.nftCount) NFT"
+        
+        cell.configure(with: cellModel)
+        
         return cell
     }
 }

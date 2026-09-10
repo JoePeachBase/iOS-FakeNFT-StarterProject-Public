@@ -50,13 +50,18 @@ final class CatalogViewModel {
         }
     }
     
-    func collection(at index: Int) -> NFTCollection? {
+    func cellModel(at index: Int) -> CatalogCellModel? {
         switch state {
         case .loaded(let collections):
             guard index >= 0 && index < collections.count else {
                 return nil
             }
-            return collections[index]
+            let collection = collections[index]
+            
+            return CatalogCellModel(
+                title: "\(collection.name) (\(collection.nftCount))",
+                coverURL: URL(string: collection.cover)
+            )
         default:
             return nil
         }
