@@ -15,9 +15,10 @@ final class TabBarController: UITabBarController {
         
         let catalogViewModel = CatalogViewModel(collectionService: servicesAssembly.collectionService)
         let catalogController = CatalogViewController(viewModel: catalogViewModel)
-        catalogController.tabBarItem = catalogTabBarItem
+        let navigationController = UINavigationController(rootViewController: catalogController)
+        navigationController.tabBarItem = catalogTabBarItem
 
-        viewControllers = [catalogController]
+        viewControllers = [navigationController]
 
         view.backgroundColor = .systemBackground
     }

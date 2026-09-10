@@ -8,12 +8,19 @@
 import UIKit
 
 final class CatalogViewController: UIViewController {
+    internal lazy var activityIndicator: UIActivityIndicatorView = {
+        let activityIndicator = UIActivityIndicatorView()
+        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
+        return activityIndicator
+    }()
+    
     private let viewModel: CatalogViewModel
     
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.dataSource = self
+        tableView.separatorStyle = .none
         tableView.register(CatalogCell.self, forCellReuseIdentifier: CatalogCell.reuseIdentifier)
         return tableView
     }()
@@ -32,19 +39,24 @@ final class CatalogViewController: UIViewController {
         setupLayoutAndConstraints()
         bindViewModel()
         viewModel.loadCollections()
+        setupNavigationItem()
     }
     
     private func bindViewModel() {
         viewModel.onStateChanged = { [weak self] state in
+            guard let self else { return }
             switch state {
             case .initial:
                 break
             case .loading:
-                break
+                self.showLoading()
             case .loaded:
-                self?.tableView.reloadData()
+                self.hideLoading()
+                self.tableView.reloadData()
             case .failed(let error):
-                print(error)
+                let errorModel = self.viewModel.makeErrorModel(error)
+                self.hideLoading()
+                self.showError(errorModel)
             }
             
         }
@@ -52,14 +64,56 @@ final class CatalogViewController: UIViewController {
     
     private func setupLayoutAndConstraints() {
         view.addSubview(tableView)
+        view.addSubview(activityIndicator)
         
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: view.topAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
+            activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             ]
         )
+    }
+    
+    private func setupNavigationItem() {
+        navigationItem.rightBarButtonItem = UIBarButtonItem(
+            image: UIImage(resource: .sort),
+            style: .plain,
+            target: self,
+            action: #selector(didTapSortButton)
+        )
+        navigationItem.rightBarButtonItem?.tintColor = .label
+    }
+    
+    @objc
+    private func didTapSortButton() {
+        let alertController = UIAlertController(title: "Сортировка", message: nil, preferredStyle: .actionSheet)
+        let byName = createAlertAction(title: "По названию", style: .default) { [weak self] _ in
+            self?.viewModel.sort(by: .name)
+        }
+        let byNFTCount = createAlertAction(title: "По количеству NFT", style: .default) { [weak self] _ in
+            self?.viewModel.sort(by: .nftCount)
+        }
+        let close = createAlertAction(title: "Закрыть", style: .cancel, handler: nil)
+        
+        alertController.addAction(byName)
+        alertController.addAction(byNFTCount)
+        alertController.addAction(close)
+        
+        present(alertController, animated: true)
+    }
+    
+    private func createAlertAction(title: String, style: UIAlertAction.Style, handler: ((UIAlertAction) -> Void)?) -> UIAlertAction {
+        let alertAction = UIAlertAction(
+            title: title,
+            style: style,
+            handler: handler
+        )
+        
+        return alertAction
     }
 }
 
@@ -79,4 +133,11 @@ extension CatalogViewController: UITableViewDataSource {
         
         return cell
     }
+}
+
+extension CatalogViewController: LoadingView {
+}
+
+extension CatalogViewController: ErrorView {
+    
 }

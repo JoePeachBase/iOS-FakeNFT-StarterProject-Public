@@ -66,4 +66,33 @@ final class CatalogViewModel {
             return nil
         }
     }
+    
+    func makeErrorModel(_ error: Error) -> ErrorModel {
+        let message: String
+        switch error {
+        case is NetworkClientError:
+            message = NSLocalizedString("Error.network", comment: "")
+        default:
+            message = NSLocalizedString("Error.unknown", comment: "")
+        }
+        
+        let actionText = NSLocalizedString("Error.repeat", comment: "")
+        return ErrorModel(message: message, actionText: actionText) {
+            [weak self] in
+            self?.loadCollections()
+        }
+    }
+    
+    func sort(by option: CatalogSortOption) {
+        guard case .loaded(let collections) = state else { return }
+        
+        switch option {
+        case .name:
+            let sortedCollections = collections.sorted { $0.name < $1.name }
+            state = .loaded(sortedCollections)
+        case .nftCount:
+            let sortedCollections = collections.sorted { $0.nftCount > $1.nftCount }
+            state = .loaded(sortedCollections)
+        }
+    }
 }
