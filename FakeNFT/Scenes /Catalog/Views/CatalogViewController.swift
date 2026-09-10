@@ -20,6 +20,7 @@ final class CatalogViewController: UIViewController {
         let tableView = UITableView()
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.dataSource = self
+        tableView.delegate = self
         tableView.separatorStyle = .none
         tableView.register(CatalogCell.self, forCellReuseIdentifier: CatalogCell.reuseIdentifier)
         return tableView
@@ -135,9 +136,23 @@ extension CatalogViewController: UITableViewDataSource {
     }
 }
 
+extension CatalogViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        
+        guard let collection = viewModel.collection(at: indexPath.row) else { return }
+        
+        let detailViewController = CollectionDetailViewController(collection: collection)
+        
+        navigationController?.pushViewController(
+            detailViewController,
+            animated: true
+        )
+    }
+}
+
 extension CatalogViewController: LoadingView {
 }
 
 extension CatalogViewController: ErrorView {
-    
 }

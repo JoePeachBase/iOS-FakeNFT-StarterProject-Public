@@ -99,6 +99,15 @@ final class CatalogViewModel {
         state = .loaded(sortedCollections)
     }
     
+    func collection(at index: Int) -> NFTCollection? {
+        switch state {
+        case .loaded(let collections):
+            guard index >= 0 && index < collections.count else { return nil }
+            return collections[index]
+        default: return nil
+        }
+    }
+    
     private func saveSortOption(_ option: CatalogSortOption) {
         UserDefaults.standard.set(option.rawValue, forKey: sortOptionKey)
     }
