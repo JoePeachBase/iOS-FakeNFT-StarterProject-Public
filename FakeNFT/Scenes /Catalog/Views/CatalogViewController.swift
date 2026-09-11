@@ -8,11 +8,6 @@
 import UIKit
 
 final class CatalogViewController: UIViewController {
-    internal lazy var activityIndicator: UIActivityIndicatorView = {
-        let activityIndicator = UIActivityIndicatorView()
-        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
-        return activityIndicator
-    }()
     
     private let viewModel: CatalogViewModel
     
@@ -37,6 +32,7 @@ final class CatalogViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        view.backgroundColor = UIColor(resource: .ypWhite)
         setupLayoutAndConstraints()
         bindViewModel()
         viewModel.loadCollections()
@@ -50,31 +46,28 @@ final class CatalogViewController: UIViewController {
             case .initial:
                 break
             case .loading:
-                self.showLoading()
+                self.tableView.allowsSelection = false
+                self.tableView.isScrollEnabled = false
+                self.tableView.reloadData()
             case .loaded:
-                self.hideLoading()
+                self.tableView.allowsSelection = true
+                self.tableView.isScrollEnabled = true
                 self.tableView.reloadData()
             case .failed(let error):
                 let errorModel = self.viewModel.makeErrorModel(error)
-                self.hideLoading()
                 self.showError(errorModel)
             }
-            
         }
     }
     
     private func setupLayoutAndConstraints() {
         view.addSubview(tableView)
-        view.addSubview(activityIndicator)
         
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: view.topAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            
-            activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             ]
         )
     }
@@ -126,13 +119,22 @@ extension CatalogViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: CatalogCell.reuseIdentifier) as? CatalogCell else { return UITableViewCell()}
         
-        guard let cellModel = viewModel.cellModel(at: indexPath.row) else {
-            return UITableViewCell()
-        }
-        
-        cell.configure(with: cellModel)
-        
-        return cell
+        switch viewModel.state {
+            case .loading:
+                cell.configureAsPlaceholder()
+
+            case .loaded:
+                guard let cellModel = viewModel.cellModel(at: indexPath.row) else {
+                    return UITableViewCell()
+                }
+
+                cell.configure(with: cellModel)
+
+            default:
+                break
+            }
+
+            return cell
     }
 }
 
@@ -149,9 +151,6 @@ extension CatalogViewController: UITableViewDelegate {
             animated: true
         )
     }
-}
-
-extension CatalogViewController: LoadingView {
 }
 
 extension CatalogViewController: ErrorView {

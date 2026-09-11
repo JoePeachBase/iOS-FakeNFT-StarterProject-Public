@@ -8,6 +8,7 @@
 import UIKit
 
 final class CollectionDetailViewController: UIViewController {
+    
     private let collection: NFTCollection
     
     init(collection: NFTCollection) {

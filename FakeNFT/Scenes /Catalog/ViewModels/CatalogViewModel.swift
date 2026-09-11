@@ -17,11 +17,15 @@ enum CatalogState {
 final class CatalogViewModel {
     
     var onStateChanged: ((CatalogState) -> Void)?
+    
     var numberOfCollections: Int {
         switch state {
+        case .loading:
+            return 4
         case .loaded(let collections):
-            collections.count
-        default: 0
+            return collections.count
+        default:
+            return 0
         }
     }
     
@@ -67,7 +71,7 @@ final class CatalogViewModel {
             let collection = collections[index]
             
             return CatalogCellModel(
-                title: "\(collection.name) (\(collection.nftCount))",
+                title: "\(collection.name.capitalized) (\(collection.nftCount))",
                 coverURL: URL(string: collection.cover)
             )
         default:
