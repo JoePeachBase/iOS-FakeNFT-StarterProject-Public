@@ -84,14 +84,14 @@ final class CatalogViewController: UIViewController {
     
     @objc
     private func didTapSortButton() {
-        let alertController = UIAlertController(title: "Сортировка", message: nil, preferredStyle: .actionSheet)
-        let byName = createAlertAction(title: "По названию", style: .default) { [weak self] _ in
+        let alertController = UIAlertController(title: NSLocalizedString("Catalog.sorting.title", comment: ""), message: nil, preferredStyle: .actionSheet)
+        let byName = createAlertAction(title: NSLocalizedString("Catalog.sorting.byName", comment: ""), style: .default) { [weak self] _ in
             self?.viewModel.sort(by: .name)
         }
-        let byNFTCount = createAlertAction(title: "По количеству NFT", style: .default) { [weak self] _ in
+        let byNFTCount = createAlertAction(title: NSLocalizedString("Catalog.sorting.byCount", comment: ""), style: .default) { [weak self] _ in
             self?.viewModel.sort(by: .nftCount)
         }
-        let close = createAlertAction(title: "Закрыть", style: .cancel, handler: nil)
+        let close = createAlertAction(title: NSLocalizedString("Common.close", comment: ""), style: .cancel, handler: nil)
         
         alertController.addAction(byName)
         alertController.addAction(byNFTCount)

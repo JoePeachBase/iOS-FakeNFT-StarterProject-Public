@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct NFTCollection: Decodable  {
+struct NFTCollection: Decodable {
     let name: String
     let nfts: [String]
     let description: String

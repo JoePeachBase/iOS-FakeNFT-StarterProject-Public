@@ -28,7 +28,7 @@ final class CatalogCell: UITableViewCell {
     private lazy var titleLabel: UILabel = {
         let titleLabel = UILabel()
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.font = .systemFont(ofSize: 17, weight: .bold)
+        titleLabel.font = .bodyBold
         return titleLabel
     }()
     

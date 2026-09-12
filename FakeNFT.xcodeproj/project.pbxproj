@@ -350,6 +350,7 @@
 			children = (
 				3FA88F9D3052B1B8008AECA4 /* NFTCollection.swift */,
 				3FA88FB930530814008AECA4 /* CatalogSortOption.swift */,
+				3FA88FB73052D795008AECA4 /* CatalogCellModel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -385,7 +386,6 @@
 			isa = PBXGroup;
 			children = (
 				3FA88FB53052D5A0008AECA4 /* CatalogCell.swift */,
-				3FA88FB73052D795008AECA4 /* CatalogCellModel.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
