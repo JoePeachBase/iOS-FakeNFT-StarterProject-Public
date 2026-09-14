@@ -161,15 +161,6 @@ final class CollectionNFTCell: UICollectionViewCell {
         
         shimmerLayer.isHidden = false
         
-//        titleLabel.text = nil
-//        priceLabel.text = nil
-//        
-//        ratingStackView.isHidden = true
-//        favoriteButton.isHidden = true
-//        cartButton.isHidden = true
-//        
-//        contentView.backgroundColor = UIColor(resource: .ypLightGray)
-        
         startShimmer()
     }
     
@@ -251,4 +242,3 @@ final class CollectionNFTCell: UICollectionViewCell {
         shimmerLayer.removeAnimation(forKey: "shimmer")
     }
 }
-

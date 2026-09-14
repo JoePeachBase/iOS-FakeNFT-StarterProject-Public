@@ -15,6 +15,8 @@ final class CollectionDetailViewController: UIViewController {
     
     private let collection: NFTCollection
     private let viewModel: CollectionDetailViewModel
+    private let authorURL = URL(string: "https://practicum.yandex.ru/ios-developer/")
+    private let nftDetailAssembly: NftDetailAssembly
     
     private var isLoading = false
     private var nfts: [Nft] = []
@@ -37,9 +39,10 @@ final class CollectionDetailViewController: UIViewController {
         return button
     }()
     
-    init(collection: NFTCollection, viewModel: CollectionDetailViewModel) {
+    init(collection: NFTCollection, viewModel: CollectionDetailViewModel, nftDetailAssembly: NftDetailAssembly) {
         self.collection = collection
         self.viewModel = viewModel
+        self.nftDetailAssembly = nftDetailAssembly
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -240,6 +243,32 @@ extension CollectionDetailViewController: UICollectionViewDataSource {
         }
         
         header.configure(with: collection)
+        
+        header.onAuthorTap = { [weak self] in
+            guard let self else { return }
+            guard let url = authorURL else { return }
+            
+            let webViewController = WebViewController(url: url)
+            webViewController.hidesBottomBarWhenPushed = true
+            navigationController?.pushViewController(webViewController, animated: true)
+        }
+        
         return header
+    }
+}
+
+extension CollectionDetailViewController: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView,didSelectItemAt indexPath: IndexPath) {
+        guard !isLoading else { return }
+
+        let nft = nfts[indexPath.item]
+
+        let input = NftDetailInput(id: nft.id)
+        let detailViewController = nftDetailAssembly.build(with: input)
+        
+        navigationController?.pushViewController(
+            detailViewController,
+            animated: true
+        )
     }
 }

@@ -21,9 +21,12 @@ final class CollectionDetailAssembly {
             nftService: serviceAssembly.nftService
         )
         
+        let nftDetailAssembly = NftDetailAssembly(servicesAssembler: serviceAssembly)
+        
         let viewController = CollectionDetailViewController(
             collection: collection,
-            viewModel: viewModel
+            viewModel: viewModel,
+            nftDetailAssembly: nftDetailAssembly
         )
         
         return viewController

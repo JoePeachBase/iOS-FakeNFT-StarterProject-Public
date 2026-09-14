@@ -9,6 +9,8 @@ import UIKit
 
 final class CollectionDetailHeaderView: UICollectionReusableView {
     
+    var onAuthorTap: (() -> Void)?
+    
     lazy var contentStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.translatesAutoresizingMaskIntoConstraints = false
@@ -30,6 +32,7 @@ final class CollectionDetailHeaderView: UICollectionReusableView {
         button.setTitleColor(UIColor(resource: .ypBlueUniversal), for: .normal)
         button.titleLabel?.font = .caption1
         button.setContentHuggingPriority(.required, for: .horizontal)
+        button.addTarget(self, action: #selector(authorButtonDidTapped), for: .touchUpInside)
         return button
     }()
     
@@ -127,6 +130,11 @@ final class CollectionDetailHeaderView: UICollectionReusableView {
             contentStackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
             contentStackView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
+    }
+    
+    @objc
+    private func authorButtonDidTapped() {
+        onAuthorTap?()
     }
 }
 
