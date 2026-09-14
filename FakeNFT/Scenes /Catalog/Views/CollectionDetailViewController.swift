@@ -16,6 +16,7 @@ final class CollectionDetailViewController: UIViewController {
     private let collection: NFTCollection
     private let viewModel: CollectionDetailViewModel
     
+    private var isLoading = false
     private var nfts: [Nft] = []
     
     private lazy var collectionView: UICollectionView = {
@@ -103,13 +104,14 @@ final class CollectionDetailViewController: UIViewController {
             case .initial:
                 break
             case .loading:
-                break
+                isLoading = true
+                collectionView.reloadData()
             case .loaded(let nfts):
-                print("LOADED NFTS:", nfts.count)
+                isLoading = false
                 self.nfts = nfts
                 collectionView.reloadData()
             case .failed(let error):
-                print("NFT LOAD ERROR:", error)
+                isLoading = false
                 print(error)
             }
             
@@ -203,7 +205,10 @@ extension CollectionDetailViewController: UICollectionViewDelegateFlowLayout {
 
 extension CollectionDetailViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        print("NUMBER OF ITEMS:", nfts.count)
+        if isLoading {
+            return collection.nfts.count
+        }
+        
         return nfts.count
     }
     
@@ -215,8 +220,13 @@ extension CollectionDetailViewController: UICollectionViewDataSource {
             return UICollectionViewCell()
         }
         
-        let nft = nfts[indexPath.item]
-        cell.configure(with: nft)
+        if isLoading {
+            cell.configureAsPlaceholder()
+        } else {
+            let nft = nfts[indexPath.item]
+            cell.configure(with: nft)
+        }
+        
         return cell
     }
     

@@ -11,7 +11,10 @@ final class CollectionNFTCell: UICollectionViewCell {
     
     static let reuseIdentifier = "CollectionNFTCell"
     
+    private var isPlaceholder = false
+    
     private let ratingStarSide: CGFloat = 12
+    private let shimmerLayer = CAGradientLayer()
     
     private let nftImageView: UIImageView = {
         let imageView = UIImageView()
@@ -83,9 +86,26 @@ final class CollectionNFTCell: UICollectionViewCell {
         return label
     }()
     
+    override func layoutSubviews() {
+        super.layoutSubviews()
+
+        shimmerLayer.frame = contentView.bounds
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+
+        stopShimmer()
+        shimmerLayer.isHidden = true
+
+        nftImageView.kf.cancelDownloadTask()
+        nftImageView.image = nil
+    }
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupLayoutAndConstraints()
+        setupShimmerLayer()
     }
     
     @available(*, unavailable)
@@ -104,6 +124,17 @@ final class CollectionNFTCell: UICollectionViewCell {
     }
     
     func configure(with nft: Nft) {
+        isPlaceholder = false
+        
+        stopShimmer()
+        shimmerLayer.isHidden = true
+        
+        contentView.subviews.forEach {
+            $0.isHidden = false
+        }
+        
+        contentView.backgroundColor = .clear
+        
         titleLabel.text = nft.name.capitalized
         priceLabel.text = "\(nft.price) ETH"
         
@@ -112,6 +143,34 @@ final class CollectionNFTCell: UICollectionViewCell {
         if let imageURL = nft.images.first {
             nftImageView.kf.setImage(with: imageURL)
         }
+    }
+    
+    func configureAsPlaceholder() {
+        isPlaceholder = true
+        
+        nftImageView.kf.cancelDownloadTask()
+        nftImageView.image = nil
+        
+        contentView.subviews.forEach {
+            $0.isHidden = true
+        }
+        
+        contentView.backgroundColor = UIColor(resource: .ypLightGray)
+        contentView.layer.cornerRadius = 12
+        contentView.clipsToBounds = true
+        
+        shimmerLayer.isHidden = false
+        
+//        titleLabel.text = nil
+//        priceLabel.text = nil
+//        
+//        ratingStackView.isHidden = true
+//        favoriteButton.isHidden = true
+//        cartButton.isHidden = true
+//        
+//        contentView.backgroundColor = UIColor(resource: .ypLightGray)
+        
+        startShimmer()
     }
     
     private func setupLayoutAndConstraints() {
@@ -158,6 +217,38 @@ final class CollectionNFTCell: UICollectionViewCell {
         
         let spacer = UIView()
         ratingStackView.addArrangedSubview(spacer)
+    }
+    
+    private func setupShimmerLayer() {
+        shimmerLayer.colors = [
+            UIColor(resource: .ypLightGray).cgColor,
+            UIColor.white.withAlphaComponent(0.6).cgColor,
+            UIColor(resource: .ypLightGray).cgColor
+        ]
+        
+        shimmerLayer.startPoint = CGPoint(x: 0, y: 0.5)
+        shimmerLayer.endPoint = CGPoint(x: 1, y: 0.5)
+        shimmerLayer.locations = [-1, -0.5, 0]
+        
+        contentView.layer.addSublayer(shimmerLayer)
+    }
+    
+    private func startShimmer() {
+        guard shimmerLayer.animation(forKey: "shimmer") == nil else {
+            return
+        }
+
+        let animation = CABasicAnimation(keyPath: "locations")
+        animation.fromValue = [-1, -0.5, 0]
+        animation.toValue = [1, 1.5, 2]
+        animation.duration = 1.2
+        animation.repeatCount = .infinity
+
+        shimmerLayer.add(animation, forKey: "shimmer")
+    }
+    
+    private func stopShimmer() {
+        shimmerLayer.removeAnimation(forKey: "shimmer")
     }
 }
 
