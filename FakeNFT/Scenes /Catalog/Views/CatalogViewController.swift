@@ -10,6 +10,7 @@ import UIKit
 final class CatalogViewController: UIViewController {
     
     private let viewModel: CatalogViewModel
+    private let collectionDetailAssembly: CollectionDetailAssembly
     
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
@@ -21,8 +22,9 @@ final class CatalogViewController: UIViewController {
         return tableView
     }()
     
-    init(viewModel: CatalogViewModel) {
+    init(viewModel: CatalogViewModel, collectionDetailAssembly: CollectionDetailAssembly) {
         self.viewModel = viewModel
+        self.collectionDetailAssembly = collectionDetailAssembly
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -144,7 +146,7 @@ extension CatalogViewController: UITableViewDelegate {
         
         guard let collection = viewModel.collection(at: indexPath.row) else { return }
         
-        let detailViewController = CollectionDetailViewController(collection: collection)
+        let detailViewController = collectionDetailAssembly.build(with: collection)
         
         navigationController?.pushViewController(
             detailViewController,

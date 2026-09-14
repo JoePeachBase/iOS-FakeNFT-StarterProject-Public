@@ -7,9 +7,16 @@
 
 import UIKit
 
+private enum Layout {
+    static let cardAspectRatio: CGFloat = 192 / 108
+}
+
 final class CollectionDetailViewController: UIViewController {
     
     private let collection: NFTCollection
+    private let viewModel: CollectionDetailViewModel
+    
+    private var nfts: [Nft] = []
     
     private lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
@@ -29,8 +36,9 @@ final class CollectionDetailViewController: UIViewController {
         return button
     }()
     
-    init(collection: NFTCollection) {
+    init(collection: NFTCollection, viewModel: CollectionDetailViewModel) {
         self.collection = collection
+        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -53,8 +61,8 @@ final class CollectionDetailViewController: UIViewController {
         view.backgroundColor = UIColor(resource: .ypWhite)
         setupCollectionView()
         setupLayoutAndConstraints()
-        
-        print(collection)
+        bindViewModel()
+        viewModel.loadNfts()
     }
     
     @objc
@@ -67,6 +75,7 @@ final class CollectionDetailViewController: UIViewController {
         collectionView.dataSource = self
         
         collectionView.register(CollectionDetailHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header")
+        collectionView.register(CollectionNFTCell.self, forCellWithReuseIdentifier: CollectionNFTCell.reuseIdentifier)
         
         collectionView.alwaysBounceVertical = true
     }
@@ -79,11 +88,32 @@ final class CollectionDetailViewController: UIViewController {
             collectionView.topAnchor.constraint(equalTo: view.topAnchor),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             
             navBarBackCustomButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
             navBarBackCustomButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
         ])
+    }
+    
+    private func bindViewModel() {
+        viewModel.onStateChanged = { [weak self] state in
+            guard let self else { return }
+            
+            switch state {
+            case .initial:
+                break
+            case .loading:
+                break
+            case .loaded(let nfts):
+                print("LOADED NFTS:", nfts.count)
+                self.nfts = nfts
+                collectionView.reloadData()
+            case .failed(let error):
+                print("NFT LOAD ERROR:", error)
+                print(error)
+            }
+            
+        }
     }
 }
 
@@ -117,15 +147,77 @@ extension CollectionDetailViewController: UICollectionViewDelegateFlowLayout {
             height: ceil(size.height)
         )
     }
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        sizeForItemAt indexPath: IndexPath
+    ) -> CGSize {
+        let horizontalInset: CGFloat = 16
+        let spacing: CGFloat = 9
+        let columns: CGFloat = 3
+
+        let availableWidth = collectionView.bounds.width
+            - horizontalInset * 2
+            - spacing * (columns - 1)
+
+        let width = floor(availableWidth / columns)
+        
+        let height = width * Layout.cardAspectRatio
+        
+        return CGSize(
+            width: width,
+            height: height
+        )
+    }
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        insetForSectionAt section: Int
+    ) -> UIEdgeInsets {
+        UIEdgeInsets(
+            top: 16,
+            left: 16,
+            bottom: 16,
+            right: 16
+        )
+    }
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        minimumInteritemSpacingForSectionAt section: Int
+    ) -> CGFloat {
+        9
+    }
+
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        minimumLineSpacingForSectionAt section: Int
+    ) -> CGFloat {
+        16
+    }
 }
 
 extension CollectionDetailViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        0
+        print("NUMBER OF ITEMS:", nfts.count)
+        return nfts.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        UICollectionViewCell()
+        guard let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: CollectionNFTCell.reuseIdentifier,
+            for: indexPath
+        ) as? CollectionNFTCell else {
+            return UICollectionViewCell()
+        }
+        
+        let nft = nfts[indexPath.item]
+        cell.configure(with: nft)
+        return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {

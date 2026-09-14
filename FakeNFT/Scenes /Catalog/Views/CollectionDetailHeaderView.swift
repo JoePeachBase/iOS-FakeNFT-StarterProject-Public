@@ -102,8 +102,12 @@ final class CollectionDetailHeaderView: UICollectionReusableView {
         if let url = URL(string: collection.cover) {
             coverImageView.kf.setImage(with: url)
         }
-        titleLabel.text = collection.name
-        descriptionLabel.text = collection.description
+        
+        titleLabel.text = collection.name.capitalized
+        
+        let description = collection.description
+        descriptionLabel.text = description.prefix(1).uppercased() + description.dropFirst()
+        
         authorButton.setTitle(collection.author, for: .normal)
         
     }
