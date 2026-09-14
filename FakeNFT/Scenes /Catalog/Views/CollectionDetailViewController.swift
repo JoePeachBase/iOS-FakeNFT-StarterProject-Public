@@ -115,7 +115,10 @@ final class CollectionDetailViewController: UIViewController {
                 collectionView.reloadData()
             case .failed(let error):
                 isLoading = false
-                print(error)
+                collectionView.reloadData()
+                
+                let errorModel = viewModel.makeErrorModel(error)
+                showError(errorModel)
             }
             
         }
@@ -271,4 +274,7 @@ extension CollectionDetailViewController: UICollectionViewDelegate {
             animated: true
         )
     }
+}
+
+extension CollectionDetailViewController: ErrorView {
 }
