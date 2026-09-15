@@ -18,11 +18,27 @@ final class ServicesAssembly {
         )
     }
     
+<<<<<<< HEAD
     var collectionService: CollectionService {
         CollectionServiceImpl(networkClient: networkClient)
     }
     
     var profileService: ProfileService {
         ProfileServiceImpl(networkClient: networkClient)
+=======
+    var cartService: CartServiceProtocol {
+        CartService(
+            networkClient: networkClient,
+            nftService: nftService
+        )
+    }
+    
+    var cartSortService: CartSortOptionServiceProtocol {
+        CartSortOptionService()
+    }
+    
+    var currencyService: CurrencyServiceProtocol {
+        CurrencyService(networkClient: networkClient)
+>>>>>>> 05b0345 (feat: Реализовал эпик Корзина (+1 squashed commit))
     }
 }

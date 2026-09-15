@@ -36,6 +36,7 @@ final class NftServiceImpl: NftService {
         }
     }
     
+<<<<<<< HEAD
     func loadNfts(ids: [String], completion: @escaping NftsCompletion) {
         let group = DispatchGroup()
         let syncQueue = DispatchQueue(label: "nftService.loadNfts.sync")
@@ -73,4 +74,7 @@ final class NftServiceImpl: NftService {
             completion(.success(nfts))
         }
     }
+=======
+    
+>>>>>>> 05b0345 (feat: Реализовал эпик Корзина (+1 squashed commit))
 }
