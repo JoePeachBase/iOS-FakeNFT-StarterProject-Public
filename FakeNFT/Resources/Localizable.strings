@@ -7,3 +7,5 @@
 
 "Tab.cart" = "Корзина";
 "Cart.empty.title" = "Корзина пуста";
+"Cart.item.price.subtitle" = "Цена";
+"Cart.button.payment.title" = "К оплате";
