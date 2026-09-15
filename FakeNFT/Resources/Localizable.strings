@@ -4,3 +4,14 @@
 "Error.unknown" = "Произошла неизвестная ошибка";
 "Error.repeat" = "Повторить";
 "Error.title" = "Ошибка";
+
+"Tab.cart" = "Корзина";
+"Cart.empty.title" = "Корзина пуста";
+"Cart.item.price.subtitle" = "Цена";
+"Cart.button.payment.title" = "К оплате";
+"Cart.menu.delete.title" = "Вы уверены, что хотите\nудалить объект из корзины?";
+"Cart.filters.title" = "Сортировка";
+"Cart.filters.byPrice" = "По цене";
+"Cart.filters.byRating" = "По рейтингу";
+"Cart.filters.byTitle" = "По названию";
+"Cart.filters.action.close" = "Закрыть";
