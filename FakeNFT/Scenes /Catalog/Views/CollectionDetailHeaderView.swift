@@ -9,9 +9,11 @@ import UIKit
 
 final class CollectionDetailHeaderView: UICollectionReusableView {
     
+    static let reuseIdentifier = "header"
+    
     var onAuthorTap: (() -> Void)?
     
-    lazy var contentStackView: UIStackView = {
+    private lazy var contentStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.axis = .vertical
@@ -27,7 +29,7 @@ final class CollectionDetailHeaderView: UICollectionReusableView {
         return stackView
     }()
     
-    lazy var authorButton: UIButton = {
+    private lazy var authorButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setTitleColor(UIColor(resource: .ypBlueUniversal), for: .normal)
         button.titleLabel?.font = .caption1
@@ -36,7 +38,7 @@ final class CollectionDetailHeaderView: UICollectionReusableView {
         return button
     }()
     
-    lazy var authorContainer: UIStackView = {
+    private lazy var authorContainer: UIStackView = {
         let container = UIStackView()
         container.spacing = 4
         container.alignment = .center
@@ -59,7 +61,7 @@ final class CollectionDetailHeaderView: UICollectionReusableView {
         return container
     }()
     
-    let coverImageView: UIImageView = {
+    private let coverImageView: UIImageView = {
         let coverImageView = UIImageView()
         coverImageView.translatesAutoresizingMaskIntoConstraints = false
         coverImageView.contentMode = .scaleAspectFill
@@ -73,14 +75,14 @@ final class CollectionDetailHeaderView: UICollectionReusableView {
         return coverImageView
     }()
     
-    let titleLabel: UILabel = {
+    private let titleLabel: UILabel = {
         let label = UILabel()
         label.textColor = UIColor(resource: .ypBlack)
         label.font = .headline3
         return label
     }()
     
-    let descriptionLabel: UILabel = {
+    private let descriptionLabel: UILabel = {
         let label = UILabel()
         label.textColor = UIColor(resource: .ypBlack)
         label.font = .caption2

@@ -29,7 +29,7 @@ final class CollectionNFTCell: UICollectionViewCell {
         let button = UIButton(type: .custom)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setImage(UIImage(resource: .favoritesNotActive), for: .normal)
-        button.addTarget(self, action: #selector(favoriteButtonDidTapped), for: .touchUpInside)
+        button.addTarget(self, action: #selector(favoriteButtonDidTap), for: .touchUpInside)
         return button
     }()
     
@@ -37,7 +37,7 @@ final class CollectionNFTCell: UICollectionViewCell {
         let button = UIButton(type: .custom)
         button.setImage(UIImage(resource: .cartNotAdded), for: .normal)
         button.tintColor = UIColor(resource: .ypBlack)
-        button.addTarget(self, action: #selector(cartButtonDidTapped), for: .touchUpInside)
+        button.addTarget(self, action: #selector(cartButtonDidTap), for: .touchUpInside)
         return button
     }()
     
@@ -112,14 +112,14 @@ final class CollectionNFTCell: UICollectionViewCell {
     required init?(coder: NSCoder) { nil }
     
     @objc
-    private func favoriteButtonDidTapped() {
-        print("favorite button did tapped")
+    private func favoriteButtonDidTap() {
+        print("favorite button did tap")
         // TODO: Implement favorite update
     }
     
     @objc
-    private func cartButtonDidTapped() {
-        print("cart button did tapped")
+    private func cartButtonDidTap() {
+        print("cart button did tap")
         // TODO: Implement cart update
     }
     

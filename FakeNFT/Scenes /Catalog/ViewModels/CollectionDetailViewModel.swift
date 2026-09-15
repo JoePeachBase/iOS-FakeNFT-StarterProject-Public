@@ -23,7 +23,7 @@ final class CollectionDetailViewModel {
     private let syncQueue = DispatchQueue(label: "collectionDetail.syncQueue")
     
     private(set) var state: CollectionDetailState = .initial {
-        didSet{
+        didSet {
             onStateChanged?(state)
         }
     }

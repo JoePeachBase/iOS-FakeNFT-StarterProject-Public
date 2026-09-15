@@ -78,7 +78,7 @@ final class CollectionDetailViewController: UIViewController {
         collectionView.delegate = self
         collectionView.dataSource = self
         
-        collectionView.register(CollectionDetailHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header")
+        collectionView.register(CollectionDetailHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: CollectionDetailHeaderView.reuseIdentifier)
         collectionView.register(CollectionNFTCell.self, forCellWithReuseIdentifier: CollectionNFTCell.reuseIdentifier)
         
         collectionView.alwaysBounceVertical = true
@@ -239,7 +239,7 @@ extension CollectionDetailViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         guard let header = collectionView.dequeueReusableSupplementaryView(
             ofKind: kind,
-            withReuseIdentifier: "header",
+            withReuseIdentifier: CollectionDetailHeaderView.reuseIdentifier,
             for: indexPath
         ) as? CollectionDetailHeaderView else {
             return UICollectionReusableView()
