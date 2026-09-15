@@ -6,3 +6,4 @@
 "Error.title" = "Ошибка";
 
 "Tab.cart" = "Корзина";
+"Cart.empty.title" = "Корзина пуста";
