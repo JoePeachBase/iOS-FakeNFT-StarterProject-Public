@@ -9,5 +9,6 @@ struct NftUiModel {
     let title: String
     let imageURL: String
     let rating: Int
-    let price: String
+    let formattedPrice: String
+    let price: Int
 }

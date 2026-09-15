@@ -40,7 +40,9 @@ final class CheckoutBottomView: UIView {
             self?.onCheckoutButtonTapped?()
         }
         
+        let buttonTitle = NSLocalizedString("Cart.button.payment.title", comment: "")
         let button = UIButton(type: .system, primaryAction: action)
+        button.setTitle(buttonTitle, for: .normal)
         button.backgroundColor = .segmentActive
         button.setTitleColor(.systemBackground, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 17, weight: .bold)
@@ -86,9 +88,8 @@ final class CheckoutBottomView: UIView {
         ])
     }
     
-    func configure(countText: String, priceText: String, buttonTitle: String) {
+    func configure(countText: String, priceText: String) {
         countLabel.text = countText
         totalPriceLabel.text = priceText
-        checkoutButton.setTitle(buttonTitle, for: .normal)
     }
 }

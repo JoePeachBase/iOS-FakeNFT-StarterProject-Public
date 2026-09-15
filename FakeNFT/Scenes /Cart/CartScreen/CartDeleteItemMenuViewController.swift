@@ -9,6 +9,8 @@ import UIKit
 
 final class CartDeleteItemMenuViewController: UIViewController {
     
+    var onDeleteButtonTap: (() -> Void)?
+    
     private let blurEffectView: UIVisualEffectView = {
         let blurEffect = UIBlurEffect(style: .systemUltraThinMaterial)
         let view = UIVisualEffectView(effect: blurEffect)
@@ -56,7 +58,12 @@ final class CartDeleteItemMenuViewController: UIViewController {
     }()
     
     private lazy var deleteButton: UIButton = {
-        let action = UIAction { [weak self] _ in self?.dismiss(animated: true) }
+        let action = UIAction { [weak self] _ in
+            guard let self else { return }
+            
+            onDeleteButtonTap?()
+            dismiss(animated: true)
+        }
         let button = UIButton(type: .system, primaryAction: action)
         button.setTitle("Удалить", for: .normal)
         button.backgroundColor = .segmentActive

@@ -8,12 +8,11 @@
 import UIKit
 import Kingfisher
 
-final class CartItemCell: UITableViewCell {
-    static let identifier = "CartItemCell"
+final class CartItemCell: UITableViewCell, ReuseIdentifying {
     
     var onCartButtonTap: (() -> Void)?
     
-    private let nftImageView: UIImageView = {
+    let nftImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
         imageView.layer.cornerRadius = 12
@@ -74,8 +73,9 @@ final class CartItemCell: UITableViewCell {
         setupView()
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        nil
     }
     
     private func setupView() {
@@ -122,24 +122,12 @@ final class CartItemCell: UITableViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         nftImageView.kf.cancelDownloadTask()
-        nftImageView.image = nil
-        ratingImageView.image = nil
-        titleLabel.text = nil
-        priceLabel.text = nil
     }
     
-    func configure(with title: String, price: String, imageUrlString: String, rating: Int) {
+    func configure(with title: String, price: String, rating: Int) {
         titleLabel.text = title
         priceLabel.text = price
-        
         setRating(with: rating)
-        
-        if let url = URL(string: imageUrlString) {
-            nftImageView.kf.setImage(
-                with: url,
-                options: [.transition(.fade(0.2)), .cacheOriginalImage]
-            )
-        }
     }
     
     private func setRating(with rating: Int) {
