@@ -131,7 +131,21 @@ extension CartViewController: UITableViewDataSource {
         }
         let nft = nfts[indexPath.row]
         cell.configure(with: nft.title, price: nft.price, imageUrlString: nft.imageURL, rating: nft.rating)
+        cell.onCartButtonTap = { [weak self] in
+            self?.showDeleteMenu()
+        }
         
         return cell
+    }
+    
+    private func showDeleteMenu() {
+        let menuViewController = CartDeleteItemMenuViewController()
+        let text = NSLocalizedString("Cart.menu.delete.title", comment: "")
+        menuViewController.configure(imageResource: ImageResource.deleteAlert, text: text)
+        
+        menuViewController.modalPresentationStyle = .overFullScreen
+        menuViewController.modalTransitionStyle = .crossDissolve
+        
+        present(menuViewController, animated: true)
     }
 }

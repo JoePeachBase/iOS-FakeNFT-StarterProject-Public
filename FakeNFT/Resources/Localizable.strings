@@ -9,3 +9,4 @@
 "Cart.empty.title" = "Корзина пуста";
 "Cart.item.price.subtitle" = "Цена";
 "Cart.button.payment.title" = "К оплате";
+"Cart.menu.delete.title" = "Вы уверены, что хотите\nудалить объект из корзины?";

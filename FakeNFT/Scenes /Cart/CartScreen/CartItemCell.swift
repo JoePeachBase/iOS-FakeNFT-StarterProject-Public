@@ -11,6 +11,8 @@ import Kingfisher
 final class CartItemCell: UITableViewCell {
     static let identifier = "CartItemCell"
     
+    var onCartButtonTap: (() -> Void)?
+    
     private let nftImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
@@ -54,8 +56,12 @@ final class CartItemCell: UITableViewCell {
         return label
     }()
     
-    private let cartButton: UIButton = {
-        let button = UIButton(type: .system)
+    private lazy var cartButton: UIButton = {
+        let action = UIAction { [weak self] _ in
+            self?.onCartButtonTap?()
+        }
+        
+        let button = UIButton(type: .system, primaryAction: action)
         let image = UIImage(resource: .delete)
         button.setImage(image, for: .normal)
         button.tintColor = .systemBlue
