@@ -18,7 +18,7 @@ final class CatalogViewController: UIViewController {
         tableView.dataSource = self
         tableView.delegate = self
         tableView.separatorStyle = .none
-        tableView.register(CatalogCell.self, forCellReuseIdentifier: CatalogCell.reuseIdentifier)
+        tableView.register(CatalogCell.self)
         return tableView
     }()
     
@@ -119,7 +119,7 @@ extension CatalogViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: CatalogCell.reuseIdentifier) as? CatalogCell else { return UITableViewCell()}
+        let cell: CatalogCell = tableView.dequeueReusableCell()
         
         switch viewModel.state {
             case .loading:

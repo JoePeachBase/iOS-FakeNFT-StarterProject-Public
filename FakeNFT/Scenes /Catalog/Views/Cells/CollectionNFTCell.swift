@@ -9,8 +9,6 @@ import UIKit
 
 final class CollectionNFTCell: UICollectionViewCell {
     
-    static let reuseIdentifier = "CollectionNFTCell"
-    
     private var isPlaceholder = false
     
     private let ratingStarSide: CGFloat = 12
@@ -123,24 +121,22 @@ final class CollectionNFTCell: UICollectionViewCell {
         // TODO: Implement cart update
     }
     
-    func configure(with nft: Nft) {
+    func configure(with model: CollectionNFTCellModel) {
         isPlaceholder = false
         
         stopShimmer()
         shimmerLayer.isHidden = true
         
-        contentView.subviews.forEach {
-            $0.isHidden = false
-        }
+        setContentHidden(false)
         
         contentView.backgroundColor = .clear
         
-        titleLabel.text = nft.name.capitalized
-        priceLabel.text = "\(nft.price) ETH"
+        titleLabel.text = model.name
+        priceLabel.text = model.price
         
-        configureRating(nft.rating)
+        configureRating(model.rating)
         
-        if let imageURL = nft.images.first {
+        if let imageURL = model.imageURL {
             nftImageView.kf.setImage(with: imageURL)
         }
     }
@@ -151,9 +147,7 @@ final class CollectionNFTCell: UICollectionViewCell {
         nftImageView.kf.cancelDownloadTask()
         nftImageView.image = nil
         
-        contentView.subviews.forEach {
-            $0.isHidden = true
-        }
+        setContentHidden(true)
         
         contentView.backgroundColor = UIColor(resource: .ypLightGray)
         contentView.layer.cornerRadius = 12
@@ -241,4 +235,13 @@ final class CollectionNFTCell: UICollectionViewCell {
     private func stopShimmer() {
         shimmerLayer.removeAnimation(forKey: "shimmer")
     }
+    
+    private func setContentHidden(_ isHidden: Bool) {
+        nftImageView.isHidden = isHidden
+        contentStackView.isHidden = isHidden
+        favoriteButton.isHidden = isHidden
+    }
+}
+
+extension CollectionNFTCell: ReuseIdentifying {
 }

@@ -13,13 +13,12 @@ private enum Layout {
 
 final class CollectionDetailViewController: UIViewController {
     
-    private let collection: NFTCollection
     private let viewModel: CollectionDetailViewModel
     private let authorURL = URL(string: "https://practicum.yandex.ru/ios-developer/")
     private let nftDetailAssembly: NftDetailAssembly
     
     private var isLoading = false
-    private var nfts: [Nft] = []
+    private var cellModels: [CollectionNFTCellModel] = []
     
     private lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
@@ -39,8 +38,7 @@ final class CollectionDetailViewController: UIViewController {
         return button
     }()
     
-    init(collection: NFTCollection, viewModel: CollectionDetailViewModel, nftDetailAssembly: NftDetailAssembly) {
-        self.collection = collection
+    init(viewModel: CollectionDetailViewModel, nftDetailAssembly: NftDetailAssembly) {
         self.viewModel = viewModel
         self.nftDetailAssembly = nftDetailAssembly
         super.init(nibName: nil, bundle: nil)
@@ -79,7 +77,7 @@ final class CollectionDetailViewController: UIViewController {
         collectionView.dataSource = self
         
         collectionView.register(CollectionDetailHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: CollectionDetailHeaderView.reuseIdentifier)
-        collectionView.register(CollectionNFTCell.self, forCellWithReuseIdentifier: CollectionNFTCell.reuseIdentifier)
+        collectionView.register(CollectionNFTCell.self)
         
         collectionView.alwaysBounceVertical = true
     }
@@ -109,9 +107,9 @@ final class CollectionDetailViewController: UIViewController {
             case .loading:
                 isLoading = true
                 collectionView.reloadData()
-            case .loaded(let nfts):
+            case .loaded(let cellModels):
                 isLoading = false
-                self.nfts = nfts
+                self.cellModels = cellModels
                 collectionView.reloadData()
             case .failed(let error):
                 isLoading = false
@@ -137,7 +135,7 @@ extension CollectionDetailViewController: UICollectionViewDelegateFlowLayout {
             frame: CGRect(x: 0, y: 0, width: width, height: 0)
         )
 
-        header.configure(with: collection)
+        header.configure(with: viewModel.headerModel)
 
         let targetSize = CGSize(
             width: width,
@@ -212,25 +210,20 @@ extension CollectionDetailViewController: UICollectionViewDelegateFlowLayout {
 extension CollectionDetailViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if isLoading {
-            return collection.nfts.count
+            return viewModel.nftCount
         }
         
-        return nfts.count
+        return cellModels.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: CollectionNFTCell.reuseIdentifier,
-            for: indexPath
-        ) as? CollectionNFTCell else {
-            return UICollectionViewCell()
-        }
+        let cell: CollectionNFTCell = collectionView.dequeueReusableCell(indexPath: indexPath)
         
         if isLoading {
             cell.configureAsPlaceholder()
         } else {
-            let nft = nfts[indexPath.item]
-            cell.configure(with: nft)
+            let model = cellModels[indexPath.item]
+            cell.configure(with: model)
         }
         
         return cell
@@ -245,7 +238,7 @@ extension CollectionDetailViewController: UICollectionViewDataSource {
             return UICollectionReusableView()
         }
         
-        header.configure(with: collection)
+        header.configure(with: viewModel.headerModel)
         
         header.onAuthorTap = { [weak self] in
             guard let self else { return }
@@ -264,9 +257,9 @@ extension CollectionDetailViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView,didSelectItemAt indexPath: IndexPath) {
         guard !isLoading else { return }
 
-        let nft = nfts[indexPath.item]
+        let cellModel = cellModels[indexPath.item]
 
-        let input = NftDetailInput(id: nft.id)
+        let input = NftDetailInput(id: cellModel.id)
         let detailViewController = nftDetailAssembly.build(with: input)
         
         navigationController?.pushViewController(

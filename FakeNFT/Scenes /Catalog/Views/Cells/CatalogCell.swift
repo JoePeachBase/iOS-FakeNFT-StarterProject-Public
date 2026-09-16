@@ -9,8 +9,6 @@ import UIKit
 
 final class CatalogCell: UITableViewCell {
     
-    static let reuseIdentifier = "CatalogCell"
-    
     private let imageHeight: CGFloat = 140
     private let imageWidth: CGFloat = 343
     private let shimmerLayer = CAGradientLayer()
@@ -126,4 +124,7 @@ final class CatalogCell: UITableViewCell {
     private func stopShimmer() {
         shimmerLayer.removeAnimation(forKey: "shimmer")
     }
+}
+
+extension CatalogCell: ReuseIdentifying {
 }

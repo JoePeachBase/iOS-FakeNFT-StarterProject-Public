@@ -103,17 +103,17 @@ final class CollectionDetailHeaderView: UICollectionReusableView {
         nil
     }
     
-    func configure(with collection: NFTCollection) {
-        if let url = URL(string: collection.cover) {
+    func configure(with model: CollectionDetailHeaderModel) {
+        if let url = model.coverURL {
             coverImageView.kf.setImage(with: url)
         }
         
-        titleLabel.text = collection.name.capitalized
+        titleLabel.text = model.name
         
-        let description = collection.description
+        let description = model.description
         descriptionLabel.text = description.prefix(1).uppercased() + description.dropFirst()
         
-        authorButton.setTitle(collection.author, for: .normal)
+        authorButton.setTitle(model.author, for: .normal)
         
     }
     

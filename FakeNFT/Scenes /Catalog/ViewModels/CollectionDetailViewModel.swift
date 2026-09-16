@@ -10,13 +10,26 @@ import Foundation
 enum CollectionDetailState {
     case initial
     case loading
-    case loaded([Nft])
+    case loaded([CollectionNFTCellModel])
     case failed(Error)
 }
 
 final class CollectionDetailViewModel {
     
     var onStateChanged: ((CollectionDetailState) -> Void)?
+    
+    var headerModel: CollectionDetailHeaderModel {
+        CollectionDetailHeaderModel(
+            name: collection.name.capitalized,
+            description: collection.description,
+            author: collection.author,
+            coverURL: URL(string: collection.cover)
+        )
+    }
+    
+    var nftCount: Int {
+        collection.nfts.count
+    }
     
     private let collection: NFTCollection
     private let nftService: NftService
@@ -68,9 +81,13 @@ final class CollectionDetailViewModel {
             
             if let loadingError {
                 self.state = .failed(loadingError)
-            } else {
-                self.state = .loaded(loadedNfts.compactMap { $0 })
+                return
             }
+            let cellModels = loadedNfts
+                .compactMap { $0 }
+                .map { self.makeCellModel(from: $0) }
+            
+            self.state = .loaded(cellModels)
         }
     }
     
@@ -88,5 +105,15 @@ final class CollectionDetailViewModel {
         return ErrorModel(message: message, actionText: actionText) { [weak self] in
             self?.loadNfts()
         }
+    }
+    
+    private func makeCellModel(from nft: Nft) -> CollectionNFTCellModel {
+        CollectionNFTCellModel(
+            id: nft.id,
+            name: nft.name.capitalized,
+            imageURL: nft.images.first,
+            rating: nft.rating,
+            price: "\(nft.price) ETH"
+        )
     }
 }

@@ -44,6 +44,8 @@
 		3F93991D30572167007BEF34 /* CollectionNFTCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F93991C30572167007BEF34 /* CollectionNFTCell.swift */; };
 		3F93991F30572234007BEF34 /* CollectionDetailAssembly.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F93991E30572234007BEF34 /* CollectionDetailAssembly.swift */; };
 		3F9E17223058450600A57FF3 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F9E17213058450600A57FF3 /* WebViewController.swift */; };
+		3FA08B35305AF3BA00A3874B /* CollectionNFTCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FA08B34305AF3BA00A3874B /* CollectionNFTCellModel.swift */; };
+		3FA08B37305AFC2E00A3874B /* CollectionDetailHeaderModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FA08B36305AFC2E00A3874B /* CollectionDetailHeaderModel.swift */; };
 		3FA88F9E3052B1B8008AECA4 /* NFTCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FA88F9D3052B1B8008AECA4 /* NFTCollection.swift */; };
 		3FA88FA13052B4C1008AECA4 /* CollectionRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FA88FA03052B4C1008AECA4 /* CollectionRequest.swift */; };
 		3FA88FA33052B7D2008AECA4 /* CollectionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FA88FA23052B7D2008AECA4 /* CollectionService.swift */; };
@@ -119,6 +121,8 @@
 		3F93991C30572167007BEF34 /* CollectionNFTCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionNFTCell.swift; sourceTree = "<group>"; };
 		3F93991E30572234007BEF34 /* CollectionDetailAssembly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionDetailAssembly.swift; sourceTree = "<group>"; };
 		3F9E17213058450600A57FF3 /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
+		3FA08B34305AF3BA00A3874B /* CollectionNFTCellModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionNFTCellModel.swift; sourceTree = "<group>"; };
+		3FA08B36305AFC2E00A3874B /* CollectionDetailHeaderModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionDetailHeaderModel.swift; sourceTree = "<group>"; };
 		3FA88F9D3052B1B8008AECA4 /* NFTCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NFTCollection.swift; sourceTree = "<group>"; };
 		3FA88FA03052B4C1008AECA4 /* CollectionRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionRequest.swift; sourceTree = "<group>"; };
 		3FA88FA23052B7D2008AECA4 /* CollectionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionService.swift; sourceTree = "<group>"; };
@@ -371,6 +375,8 @@
 				3FA88F9D3052B1B8008AECA4 /* NFTCollection.swift */,
 				3FA88FB930530814008AECA4 /* CatalogSortOption.swift */,
 				3FA88FB73052D795008AECA4 /* CatalogCellModel.swift */,
+				3FA08B34305AF3BA00A3874B /* CollectionNFTCellModel.swift */,
+				3FA08B36305AFC2E00A3874B /* CollectionDetailHeaderModel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -596,6 +602,7 @@
 				3F478ECF29DB474E00F6D39E /* Colors.swift in Sources */,
 				3FA88F9E3052B1B8008AECA4 /* NFTCollection.swift in Sources */,
 				0C79EE662A76DDFF00EE90EA /* NftDetailViewController.swift in Sources */,
+				3FA08B35305AF3BA00A3874B /* CollectionNFTCellModel.swift in Sources */,
 				E1A1B9DA2AA01CE400C3AFBC /* TabBarController.swift in Sources */,
 				3F478ED129DB476500F6D39E /* Fonts.swift in Sources */,
 				3F93991D30572167007BEF34 /* CollectionNFTCell.swift in Sources */,
@@ -628,6 +635,7 @@
 				3F6806D729CBC50A00B4F915 /* CellsReusingUtils.swift in Sources */,
 				0C79EE612A76DCD600EE90EA /* NftByIdRequest.swift in Sources */,
 				E19CD5AB2A98B56600CA39A5 /* NftImageCollectionViewCell.swift in Sources */,
+				3FA08B37305AFC2E00A3874B /* CollectionDetailHeaderModel.swift in Sources */,
 				0CF2C2E12A784C7000FDC837 /* LinePageControl.swift in Sources */,
 				3F6806D329CBBE9600B4F915 /* NetworkRequest.swift in Sources */,
 				0CFCB7492A7808900009A829 /* TestCatalogController.swift in Sources */,
