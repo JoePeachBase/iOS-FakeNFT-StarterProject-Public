@@ -10,6 +10,7 @@ import UIKit
 final class CatalogViewController: UIViewController {
     
     private let viewModel: CatalogViewModel
+    private let collectionDetailAssembly: CollectionDetailAssembly
     
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
@@ -17,12 +18,13 @@ final class CatalogViewController: UIViewController {
         tableView.dataSource = self
         tableView.delegate = self
         tableView.separatorStyle = .none
-        tableView.register(CatalogCell.self, forCellReuseIdentifier: CatalogCell.reuseIdentifier)
+        tableView.register(CatalogCell.self)
         return tableView
     }()
     
-    init(viewModel: CatalogViewModel) {
+    init(viewModel: CatalogViewModel, collectionDetailAssembly: CollectionDetailAssembly) {
         self.viewModel = viewModel
+        self.collectionDetailAssembly = collectionDetailAssembly
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -117,7 +119,7 @@ extension CatalogViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: CatalogCell.reuseIdentifier) as? CatalogCell else { return UITableViewCell()}
+        let cell: CatalogCell = tableView.dequeueReusableCell()
         
         switch viewModel.state {
             case .loading:
@@ -144,7 +146,7 @@ extension CatalogViewController: UITableViewDelegate {
         
         guard let collection = viewModel.collection(at: indexPath.row) else { return }
         
-        let detailViewController = CollectionDetailViewController(collection: collection)
+        let detailViewController = collectionDetailAssembly.build(with: collection)
         
         navigationController?.pushViewController(
             detailViewController,
