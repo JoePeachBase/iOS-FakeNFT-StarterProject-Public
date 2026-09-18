@@ -33,6 +33,7 @@ final class CollectionDetailViewModel {
     
     private let collection: NFTCollection
     private let nftService: NftService
+    private let profileService: ProfileService
     private let syncQueue = DispatchQueue(label: "collectionDetail.syncQueue")
     
     private(set) var state: CollectionDetailState = .initial {
@@ -41,9 +42,14 @@ final class CollectionDetailViewModel {
         }
     }
     
-    init(collection: NFTCollection, nftService: NftService) {
+    private var favoriteIDs: Set<String> = []
+    private var updatingFavoriteIDs: Set<String> = []
+    private var nfts: [Nft] = []
+    
+    init(collection: NFTCollection, nftService: NftService, profileService: ProfileService) {
         self.collection = collection
         self.nftService = nftService
+        self.profileService = profileService
     }
     
     func loadNfts() {
@@ -76,6 +82,23 @@ final class CollectionDetailViewModel {
             }
         }
         
+        group.enter()
+        
+        loadProfile { result in
+            switch result {
+            case .success:
+                group.leave()
+                
+            case .failure(let error):
+                self.syncQueue.async {
+                    if loadingError == nil {
+                        loadingError = error
+                    }
+                    group.leave()
+                }
+            }
+        }
+        
         group.notify(queue: .main) { [weak self] in
             guard let self else { return }
             
@@ -83,8 +106,10 @@ final class CollectionDetailViewModel {
                 self.state = .failed(loadingError)
                 return
             }
-            let cellModels = loadedNfts
-                .compactMap { $0 }
+            
+            self.nfts = loadedNfts.compactMap{ $0 }
+            
+            let cellModels = self.nfts
                 .map { self.makeCellModel(from: $0) }
             
             self.state = .loaded(cellModels)
@@ -107,13 +132,76 @@ final class CollectionDetailViewModel {
         }
     }
     
+    func toggleFavorite(nftID: String) {
+        guard !updatingFavoriteIDs.contains(nftID) else { return }
+        
+        let wasFavorite = favoriteIDs.contains(nftID)
+        
+        if wasFavorite{
+            favoriteIDs.remove(nftID)
+        } else {
+            favoriteIDs.insert(nftID)
+        }
+        
+        updatingFavoriteIDs.insert(nftID)
+        updateCellModels()
+        
+        profileService.updateProfile(likes: Array(favoriteIDs)) { [weak self] result in
+            guard let self else { return }
+            
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let profile):
+                    self.favoriteIDs = Set(profile.likes)
+                    self.updatingFavoriteIDs.remove(nftID)
+                    self.updateCellModels()
+                    
+                case .failure:
+                    if wasFavorite {
+                        self.favoriteIDs.insert(nftID)
+                    } else {
+                        self.favoriteIDs.remove(nftID)
+                    }
+                    
+                    self.updatingFavoriteIDs.remove(nftID)
+                    self.updateCellModels()
+                }
+            }
+            
+        }
+    }
+    
+    func isFavoriteUpdating(nftID: String) -> Bool {
+        updatingFavoriteIDs.contains(nftID)
+    }
+    
     private func makeCellModel(from nft: Nft) -> CollectionNFTCellModel {
         CollectionNFTCellModel(
             id: nft.id,
             name: nft.name.capitalized,
             imageURL: nft.images.first,
             rating: nft.rating,
-            price: "\(nft.price) ETH"
+            price: "\(nft.price) ETH",
+            isFavorite: favoriteIDs.contains(nft.id),
+            isFavoriteUpdating: updatingFavoriteIDs.contains(nft.id)
         )
+    }
+    
+    private func loadProfile(completion: @escaping (Result<Profile, Error>) -> Void) {
+        profileService.loadProfile { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case .success(let profile):
+                self.favoriteIDs = Set(profile.likes)
+                completion(.success(profile))
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    private func updateCellModels() {
+        let cellModels = nfts.map { makeCellModel(from: $0) }
+        state = .loaded(cellModels)
     }
 }

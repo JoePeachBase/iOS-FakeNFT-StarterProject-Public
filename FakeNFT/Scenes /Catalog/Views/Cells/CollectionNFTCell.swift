@@ -9,6 +9,8 @@ import UIKit
 
 final class CollectionNFTCell: UICollectionViewCell {
     
+    var onFavoriteTap: (() -> Void)?
+    
     private var isPlaceholder = false
     
     private let ratingStarSide: CGFloat = 12
@@ -98,6 +100,9 @@ final class CollectionNFTCell: UICollectionViewCell {
 
         nftImageView.kf.cancelDownloadTask()
         nftImageView.image = nil
+        
+        favoriteButton.alpha = 1.0
+        favoriteButton.isUserInteractionEnabled = true
     }
     
     override init(frame: CGRect) {
@@ -111,8 +116,7 @@ final class CollectionNFTCell: UICollectionViewCell {
     
     @objc
     private func favoriteButtonDidTap() {
-        print("favorite button did tap")
-        // TODO: Implement favorite update
+        onFavoriteTap?()
     }
     
     @objc
@@ -139,6 +143,16 @@ final class CollectionNFTCell: UICollectionViewCell {
         if let imageURL = model.imageURL {
             nftImageView.kf.setImage(with: imageURL)
         }
+        
+        favoriteButton.setImage(
+            model.isFavorite ?
+            UIImage(resource: .favoritesActive)
+            : UIImage(resource: .favoritesNotActive),
+            for: .normal
+        )
+        
+        favoriteButton.alpha = model.isFavoriteUpdating ? 0.5 : 1.0
+        favoriteButton.isUserInteractionEnabled = !model.isFavoriteUpdating
     }
     
     func configureAsPlaceholder() {

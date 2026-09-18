@@ -18,7 +18,8 @@ final class CollectionDetailAssembly {
     func build(with collection: NFTCollection) -> UIViewController {
         let viewModel = CollectionDetailViewModel(
             collection: collection,
-            nftService: serviceAssembly.nftService
+            nftService: serviceAssembly.nftService,
+            profileService: serviceAssembly.profileService
         )
         
         let nftDetailAssembly = NftDetailAssembly(servicesAssembler: serviceAssembly)

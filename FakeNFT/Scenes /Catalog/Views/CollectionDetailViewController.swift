@@ -224,6 +224,9 @@ extension CollectionDetailViewController: UICollectionViewDataSource {
         } else {
             let model = cellModels[indexPath.item]
             cell.configure(with: model)
+            cell.onFavoriteTap = { [weak self] in
+                self?.viewModel.toggleFavorite(nftID: model.id)
+            }
         }
         
         return cell
@@ -258,6 +261,10 @@ extension CollectionDetailViewController: UICollectionViewDelegate {
         guard !isLoading else { return }
 
         let cellModel = cellModels[indexPath.item]
+        
+        guard !viewModel.isFavoriteUpdating(nftID: cellModel.id) else {
+            return
+        }
 
         let input = NftDetailInput(id: cellModel.id)
         let detailViewController = nftDetailAssembly.build(with: input)
