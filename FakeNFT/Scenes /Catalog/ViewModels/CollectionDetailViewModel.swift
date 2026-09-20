@@ -34,7 +34,6 @@ final class CollectionDetailViewModel {
     private let collection: NFTCollection
     private let nftService: NftService
     private let profileService: ProfileService
-    private let syncQueue = DispatchQueue(label: "collectionDetail.syncQueue")
     
     private(set) var state: CollectionDetailState = .initial {
         didSet {
@@ -56,29 +55,26 @@ final class CollectionDetailViewModel {
         state = .loading
         
         let group = DispatchGroup()
-        var loadedNfts = Array<Nft?>(repeating: nil, count: collection.nfts.count)
+        let syncQueue = DispatchQueue(label: "collectionDetail.load.sync")
+        
+        var loadedNfts: [Nft] = []
         var loadingError: Error?
         
-        for (index, nftID) in collection.nfts.enumerated() {
-            group.enter()
+        group.enter()
+        
+        nftService.loadNfts(ids: collection.nfts) { result in
             
-            nftService.loadNft(id: nftID) { [weak self] result in
-                guard let self else {
-                    group.leave()
-                    return
-                }
-                
-                self.syncQueue.async {
-                    switch result {
-                    case .success(let nft): loadedNfts[index] = nft
-                        
-                    case .failure(let error):
-                        if loadingError == nil {
-                            loadingError = error
-                        }
+            syncQueue.async {
+                switch result {
+                case .success(let nfts):
+                    loadedNfts = nfts
+                    
+                case .failure(let error):
+                    if loadingError == nil {
+                        loadingError = error
                     }
-                    group.leave()
                 }
+                group.leave()
             }
         }
         
@@ -90,7 +86,7 @@ final class CollectionDetailViewModel {
                 group.leave()
                 
             case .failure(let error):
-                self.syncQueue.async {
+                syncQueue.async {
                     if loadingError == nil {
                         loadingError = error
                     }
@@ -107,7 +103,7 @@ final class CollectionDetailViewModel {
                 return
             }
             
-            self.nfts = loadedNfts.compactMap{ $0 }
+            self.nfts = loadedNfts
             
             let cellModels = self.nfts
                 .map { self.makeCellModel(from: $0) }
@@ -137,7 +133,7 @@ final class CollectionDetailViewModel {
         
         let wasFavorite = favoriteIDs.contains(nftID)
         
-        if wasFavorite{
+        if wasFavorite {
             favoriteIDs.remove(nftID)
         } else {
             favoriteIDs.insert(nftID)
