@@ -17,6 +17,7 @@ enum CollectionDetailState {
 final class CollectionDetailViewModel {
     
     var onStateChanged: ((CollectionDetailState) -> Void)?
+    var onActionError: ((Error) -> Void)?
     
     var headerModel: CollectionDetailHeaderModel {
         CollectionDetailHeaderModel(
@@ -34,6 +35,7 @@ final class CollectionDetailViewModel {
     private let collection: NFTCollection
     private let nftService: NftService
     private let profileService: ProfileService
+    private let orderService: OrderService
     
     private(set) var state: CollectionDetailState = .initial {
         didSet {
@@ -44,11 +46,14 @@ final class CollectionDetailViewModel {
     private var favoriteIDs: Set<String> = []
     private var updatingFavoriteIDs: Set<String> = []
     private var nfts: [Nft] = []
+    private var cartIDs: Set<String> = []
+    private var updatingCartIDs: Set<String> = []
     
-    init(collection: NFTCollection, nftService: NftService, profileService: ProfileService) {
+    init(collection: NFTCollection, nftService: NftService, profileService: ProfileService, orderService: OrderService) {
         self.collection = collection
         self.nftService = nftService
         self.profileService = profileService
+        self.orderService = orderService
     }
     
     func loadNfts() {
@@ -95,6 +100,23 @@ final class CollectionDetailViewModel {
             }
         }
         
+        group.enter()
+        
+        loadOrder { result in
+            switch result {
+            case .success:
+                group.leave()
+
+            case .failure(let error):
+                syncQueue.async {
+                    if loadingError == nil {
+                        loadingError = error
+                    }
+                    group.leave()
+                }
+            }
+        }
+        
         group.notify(queue: .main) { [weak self] in
             guard let self else { return }
             
@@ -128,6 +150,25 @@ final class CollectionDetailViewModel {
         }
     }
     
+    func makeActionErrorModel(_ error: Error) -> ErrorModel {
+        let message: String
+
+        switch error {
+        case is NetworkClientError:
+            message = NSLocalizedString("Error.network", comment: "")
+        default:
+            message = NSLocalizedString("Error.unknown", comment: "")
+        }
+
+        let actionText = NSLocalizedString("Common.close", comment: "")
+
+        return ErrorModel(
+            message: message,
+            actionText: actionText,
+            action: {}
+        )
+    }
+    
     func toggleFavorite(nftID: String) {
         guard !updatingFavoriteIDs.contains(nftID) else { return }
         
@@ -152,7 +193,7 @@ final class CollectionDetailViewModel {
                     self.updatingFavoriteIDs.remove(nftID)
                     self.updateCellModels()
                     
-                case .failure:
+                case .failure(let error):
                     if wasFavorite {
                         self.favoriteIDs.insert(nftID)
                     } else {
@@ -161,9 +202,49 @@ final class CollectionDetailViewModel {
                     
                     self.updatingFavoriteIDs.remove(nftID)
                     self.updateCellModels()
+                    self.onActionError?(error)
                 }
             }
             
+        }
+    }
+    
+    func toggleCart(nftID: String) {
+        guard !updatingCartIDs.contains(nftID) else { return }
+        
+        let wasInCart = cartIDs.contains(nftID)
+        
+        if wasInCart {
+            cartIDs.remove(nftID)
+        } else {
+            cartIDs.insert(nftID)
+        }
+        updatingCartIDs.insert(nftID)
+        updateCellModels()
+        
+        let request = OrderUpdateRequestModel(nfts: Array(cartIDs))
+        
+        orderService.updateOrder(request: request) { [weak self] result in
+            guard let self else { return }
+            
+            DispatchQueue.main.async {
+                switch result {
+                case .success:
+                    self.updatingCartIDs.remove(nftID)
+                    self.updateCellModels()
+                    
+                case .failure(let error):
+                    if wasInCart {
+                        self.cartIDs.insert(nftID)
+                    } else {
+                        self.cartIDs.remove(nftID)
+                    }
+                    
+                    self.updatingCartIDs.remove(nftID)
+                    self.updateCellModels()
+                    self.onActionError?(error)
+                }
+            }
         }
     }
     
@@ -179,7 +260,9 @@ final class CollectionDetailViewModel {
             rating: nft.rating,
             price: "\(nft.price) ETH",
             isFavorite: favoriteIDs.contains(nft.id),
-            isFavoriteUpdating: updatingFavoriteIDs.contains(nft.id)
+            isFavoriteUpdating: updatingFavoriteIDs.contains(nft.id),
+            isInCart: cartIDs.contains(nft.id),
+            isCartUpdating: updatingCartIDs.contains(nft.id)
         )
     }
     
@@ -199,5 +282,20 @@ final class CollectionDetailViewModel {
     private func updateCellModels() {
         let cellModels = nfts.map { makeCellModel(from: $0) }
         state = .loaded(cellModels)
+    }
+    
+    private func loadOrder(completion: @escaping (Result<OrderResponseModel, Error>) -> Void) {
+        orderService.loadOrder { [weak self] result in
+            guard let self else { return }
+
+            switch result {
+            case .success(let order):
+                self.cartIDs = Set(order.nfts)
+                completion(.success(order))
+
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
     }
 }

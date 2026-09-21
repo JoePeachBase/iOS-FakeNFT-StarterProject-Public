@@ -15,4 +15,6 @@ struct CollectionNFTCellModel {
     let price: String
     let isFavorite: Bool
     let isFavoriteUpdating: Bool
+    let isInCart: Bool
+    let isCartUpdating: Bool
 }

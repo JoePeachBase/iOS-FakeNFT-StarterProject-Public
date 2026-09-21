@@ -16,10 +16,12 @@ final class CollectionDetailAssembly {
     }
     
     func build(with collection: NFTCollection) -> UIViewController {
+        let orderService = MockOrderService()
         let viewModel = CollectionDetailViewModel(
             collection: collection,
             nftService: serviceAssembly.nftService,
-            profileService: serviceAssembly.profileService
+            profileService: serviceAssembly.profileService,
+            orderService: orderService
         )
         
         let nftDetailAssembly = NftDetailAssembly(servicesAssembler: serviceAssembly)

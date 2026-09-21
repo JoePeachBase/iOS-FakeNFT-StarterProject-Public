@@ -118,6 +118,13 @@ final class CollectionDetailViewController: UIViewController {
                 let errorModel = viewModel.makeErrorModel(error)
                 showError(errorModel)
             }
+        }
+        
+        viewModel.onActionError = { [weak self] error in
+            guard let self else { return }
+            
+            let errorModel = self.viewModel.makeActionErrorModel(error)
+            self.showError(errorModel)
             
         }
     }
@@ -227,6 +234,9 @@ extension CollectionDetailViewController: UICollectionViewDataSource {
             cell.onFavoriteTap = { [weak self] in
                 self?.viewModel.toggleFavorite(nftID: model.id)
             }
+            cell.onCartTap = { [weak self] in
+                self?.viewModel.toggleCart(nftID: model.id)
+            }
         }
         
         return cell
@@ -262,7 +272,8 @@ extension CollectionDetailViewController: UICollectionViewDelegate {
 
         let cellModel = cellModels[indexPath.item]
         
-        guard !viewModel.isFavoriteUpdating(nftID: cellModel.id) else {
+        guard !viewModel.isFavoriteUpdating(nftID: cellModel.id)
+        else {
             return
         }
 
