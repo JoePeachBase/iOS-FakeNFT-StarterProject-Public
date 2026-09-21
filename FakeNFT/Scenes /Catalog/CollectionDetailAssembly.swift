@@ -16,7 +16,11 @@ final class CollectionDetailAssembly {
     }
     
     func build(with collection: NFTCollection) -> UIViewController {
+        
+        // TODO: Replace MockOrderService with real OrderService
+        // after the Cart module implementation is completed.
         let orderService = MockOrderService()
+        
         let viewModel = CollectionDetailViewModel(
             collection: collection,
             nftService: serviceAssembly.nftService,
