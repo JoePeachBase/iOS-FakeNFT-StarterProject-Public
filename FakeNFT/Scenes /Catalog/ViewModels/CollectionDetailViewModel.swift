@@ -36,6 +36,7 @@ final class CollectionDetailViewModel {
     private let nftService: NftService
     private let profileService: ProfileService
     private let orderService: OrderService
+    private let loadSyncQueueLabel = "collectionDetail.load.sync"
     
     private(set) var state: CollectionDetailState = .initial {
         didSet {
@@ -49,7 +50,12 @@ final class CollectionDetailViewModel {
     private var cartIDs: Set<String> = []
     private var updatingCartIDs: Set<String> = []
     
-    init(collection: NFTCollection, nftService: NftService, profileService: ProfileService, orderService: OrderService) {
+    init(
+        collection: NFTCollection,
+        nftService: NftService,
+        profileService: ProfileService,
+        orderService: OrderService
+    ) {
         self.collection = collection
         self.nftService = nftService
         self.profileService = profileService
@@ -60,7 +66,7 @@ final class CollectionDetailViewModel {
         state = .loading
         
         let group = DispatchGroup()
-        let syncQueue = DispatchQueue(label: "collectionDetail.load.sync")
+        let syncQueue = DispatchQueue(label: loadSyncQueueLabel)
         
         var loadedNfts: [Nft] = []
         var loadingError: Error?

@@ -272,8 +272,7 @@ extension CollectionDetailViewController: UICollectionViewDelegate {
 
         let cellModel = cellModels[indexPath.item]
         
-        guard !viewModel.isFavoriteUpdating(nftID: cellModel.id)
-        else {
+        guard !viewModel.isFavoriteUpdating(nftID: cellModel.id) else {
             return
         }
 

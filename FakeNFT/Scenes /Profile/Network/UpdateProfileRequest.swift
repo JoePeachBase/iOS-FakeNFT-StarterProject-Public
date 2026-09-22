@@ -9,14 +9,15 @@ import Foundation
 
 struct UpdateProfileRequest: NetworkRequest {
     var endpoint: URL? {
-        URL(string: "\(RequestConstants.baseURL)/api/v1/profile/1")
+        URL(string: "\(RequestConstants.baseURL)\(RequestConstants.profilePath)")
     }
     
-    var likes: [String]
-    var httpMethod: HttpMethod = .put
     var dto: Dto? {
         LikesDtoObject(likes: likes)
     }
+    
+    let likes: [String]
+    let httpMethod: HttpMethod = .put
 }
 
 struct LikesDtoObject: Dto {
@@ -28,11 +29,7 @@ struct LikesDtoObject: Dto {
         : likes.joined(separator: ",")
     }
     
-    enum CodingKeys: String, CodingKey {
-        case likes = "likes"
-    }
-    
     func asDictionary() -> [String : String] {
-        [CodingKeys.likes.rawValue: joinedLikes]
+        ["likes": joinedLikes]
     }
 }
