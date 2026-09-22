@@ -9,6 +9,9 @@ import UIKit
 
 final class CollectionNFTCell: UICollectionViewCell {
     
+    var onFavoriteTap: (() -> Void)?
+    var onCartTap: (() -> Void)?
+    
     private var isPlaceholder = false
     
     private let ratingStarSide: CGFloat = 12
@@ -26,14 +29,12 @@ final class CollectionNFTCell: UICollectionViewCell {
     private lazy var favoriteButton: UIButton = {
         let button = UIButton(type: .custom)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.setImage(UIImage(resource: .favoritesNotActive), for: .normal)
         button.addTarget(self, action: #selector(favoriteButtonDidTap), for: .touchUpInside)
         return button
     }()
     
     private lazy var cartButton: UIButton = {
         let button = UIButton(type: .custom)
-        button.setImage(UIImage(resource: .cartNotAdded), for: .normal)
         button.tintColor = UIColor(resource: .ypBlack)
         button.addTarget(self, action: #selector(cartButtonDidTap), for: .touchUpInside)
         return button
@@ -98,6 +99,12 @@ final class CollectionNFTCell: UICollectionViewCell {
 
         nftImageView.kf.cancelDownloadTask()
         nftImageView.image = nil
+        
+        favoriteButton.alpha = 1.0
+        favoriteButton.isUserInteractionEnabled = true
+        
+        cartButton.alpha = 1.0
+        cartButton.isUserInteractionEnabled = true
     }
     
     override init(frame: CGRect) {
@@ -111,14 +118,12 @@ final class CollectionNFTCell: UICollectionViewCell {
     
     @objc
     private func favoriteButtonDidTap() {
-        print("favorite button did tap")
-        // TODO: Implement favorite update
+        onFavoriteTap?()
     }
     
     @objc
     private func cartButtonDidTap() {
-        print("cart button did tap")
-        // TODO: Implement cart update
+        onCartTap?()
     }
     
     func configure(with model: CollectionNFTCellModel) {
@@ -139,6 +144,26 @@ final class CollectionNFTCell: UICollectionViewCell {
         if let imageURL = model.imageURL {
             nftImageView.kf.setImage(with: imageURL)
         }
+        
+        favoriteButton.setImage(
+            model.isFavorite ?
+            UIImage(resource: .favoritesActive)
+            : UIImage(resource: .favoritesNotActive),
+            for: .normal
+        )
+        
+        cartButton.setImage(
+            model.isInCart ?
+            UIImage(resource: .cartAdded)
+            : UIImage(resource: .cartNotAdded),
+            for: .normal
+        )
+        
+        favoriteButton.alpha = model.isFavoriteUpdating ? 0.5 : 1.0
+        favoriteButton.isUserInteractionEnabled = !model.isFavoriteUpdating
+        
+        cartButton.alpha = model.isCartUpdating ? 0.5 : 1.0
+        cartButton.isUserInteractionEnabled = !model.isCartUpdating
     }
     
     func configureAsPlaceholder() {

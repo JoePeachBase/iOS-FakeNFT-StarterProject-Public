@@ -13,4 +13,8 @@ struct CollectionNFTCellModel {
     let imageURL: URL?
     let rating: Int
     let price: String
+    let isFavorite: Bool
+    let isFavoriteUpdating: Bool
+    let isInCart: Bool
+    let isCartUpdating: Bool
 }
