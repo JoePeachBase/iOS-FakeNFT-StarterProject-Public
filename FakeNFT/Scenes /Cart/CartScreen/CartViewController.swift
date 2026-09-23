@@ -10,7 +10,7 @@ import UIKit
 final class CartViewController: UIViewController {
     // MARK: - Private properties
     private let viewModel = CartViewModel()
-    private let filtersService: FiltersServiceProtocol = FiltersService()
+    private let filtersService: CartSortOptionServiceProtocol = CartSortOptionService()
     
     private let emptyView: EmptyView = {
         let title = NSLocalizedString("Cart.empty.title", comment: "")
@@ -31,7 +31,7 @@ final class CartViewController: UIViewController {
         return checkout
     }()
     
-    private var nfts: [NftUiModel] = [
+    private var nfts: [NftModel] = [
         .init(
             title: "Что-то",
             imageURL: "https://code.s3.yandex.net/Mobile/iOS/NFT/Beige/April/1.png",
@@ -75,7 +75,9 @@ final class CartViewController: UIViewController {
         setupNavBar()
         setupView()
         setupTableView()
-        viewModel.state.bindListener(listenState)
+        viewModel.state.bindListener { [weak self] state in
+            self?.listenState(state)
+        }
     }
     
     private func setupNavBar() {
@@ -102,9 +104,11 @@ final class CartViewController: UIViewController {
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             
-            checkoutView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            checkoutView.bottomAnchor
+                .constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             checkoutView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            checkoutView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            checkoutView.trailingAnchor
+                .constraint(equalTo: view.trailingAnchor),
             
             emptyView.topAnchor.constraint(equalTo: view.topAnchor),
             emptyView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
@@ -118,7 +122,7 @@ final class CartViewController: UIViewController {
         tableView.register(CartItemCell.self)
     }
     
-    private func listenState(_ state: ViewState<[NftUiModel]>) {
+    private func listenState(_ state: ViewState<[NftModel]>) {
         // TODO Добавить обработку стейта
     }
     
@@ -129,31 +133,49 @@ final class CartViewController: UIViewController {
     
     private func makeFiltersActionSheet() -> UIAlertController {
         let title = NSLocalizedString("Cart.filters.title", comment: "")
-        let actionSheet = UIAlertController(title: title, message: nil, preferredStyle: .actionSheet)
+        let actionSheet = UIAlertController(
+            title: title,
+            message: nil,
+            preferredStyle: .actionSheet
+        )
         
-        let currentFilter = filtersService.loadFilters()
+        let currentFilter = filtersService.loadSortOption()
         
-        Filter.allCases.forEach { filter in
-            let isCurrent = filter == currentFilter
-            let actionTitle = isCurrent ? "\(filter.title)  ✓" : filter.title
+        CartSortOption.allCases.forEach { sortOption in
+            let isCurrent = sortOption == currentFilter
+            let actionTitle = isCurrent ? "\(sortOption.title)  ✓" : sortOption.title
             
             let action = UIAlertAction(title: actionTitle, style: .default) { [weak self] _ in
-                self?.handleFilterSelection(filter)
+                self?.handleFilterSelection(sortOption)
             }
             actionSheet.addAction(action)
         }
         
-        let closeTitle = NSLocalizedString("Cart.filters.action.close", comment: "")
-        let closeAction = UIAlertAction(title: closeTitle, style: .cancel, handler: nil)
+        let closeTitle = NSLocalizedString(
+            "Cart.filters.action.close",
+            comment: ""
+        )
+        let closeAction = UIAlertAction(
+            title: closeTitle,
+            style: .cancel,
+            handler: nil
+        )
         actionSheet.addAction(closeAction)
         
         return actionSheet
     }
     
-    private func handleFilterSelection(_ filter: Filter) {
-        filtersService.saveFilter(filter)
-        nfts = sort(nfts, by: filter)
-        tableView.reloadData()
+    private func handleFilterSelection(_ sortOption: CartSortOption) {
+        filtersService.saveSortOption(sortOption)
+        nfts = sort(nfts, with: sortOption)
+        
+        UIView.transition(
+            with: tableView,
+            duration: 0.2,
+            options: .transitionCrossDissolve
+        ) {
+            self.tableView.reloadData()
+        }
     }
     
     private func deleteNft(at indexPath: IndexPath) {
@@ -197,22 +219,16 @@ extension CartViewController: UITableViewDataSource {
         let cell: CartItemCell = tableView.dequeueReusableCell()
         let nft = nfts[indexPath.row]
         
-        cell.nftImageView.kf.setImage(
-            with: URL(string: nft.imageURL),
-            placeholder: UIImage(resource: .deleteAlert),
-            options: []
-        ) { result in
-            switch result {
-            case .success:
-                print("")
-                tableView.reloadRows(at: [indexPath], with: .automatic)
-            case .failure(let error):
-                print("Ошибка загрузки картинки \(error)")
-            }
-        }
-        cell.configure(with: nft.title, price: nft.formattedPrice, rating: nft.rating)
+        cell.configure(
+            with: nft.title,
+            price: nft.formattedPrice,
+            rating: nft.rating,
+            imageURL: nft.imageURL
+        )
         cell.onCartButtonTap = { [weak self] in
-            guard let actualIndexPath = self?.tableView.indexPath(for: cell) else { return }
+            guard let actualIndexPath = self?.tableView.indexPath(for: cell) else {
+                return
+            }
             self?.showDeleteMenu(actualIndexPath)
         }
         
@@ -227,7 +243,8 @@ extension CartViewController: UITableViewDataSource {
         let menuViewController = CartDeleteItemMenuViewController()
         let text = NSLocalizedString("Cart.menu.delete.title", comment: "")
         
-        menuViewController.configure(imageResource: ImageResource.deleteAlert, text: text)
+        menuViewController
+            .configure(imageResource: ImageResource.deleteAlert, text: text)
         menuViewController.onDeleteButtonTap = { [weak self] in
             self?.deleteNft(at: indexPath)
         }
@@ -241,10 +258,13 @@ extension CartViewController: UITableViewDataSource {
 
 // MARK: - NFT sorting by filter
 extension CartViewController {
-    func sort(_ nfts: [NftUiModel], by filter: Filter) -> [NftUiModel] {
-        switch filter {
+    func sort(_ nfts: [NftModel], with sortOption: CartSortOption) -> [NftModel] {
+        switch sortOption {
         case .title:
-            return nfts.sorted { $0.title.localizedCompare($1.title) == .orderedAscending }
+            return nfts
+                .sorted {
+                    $0.title.localizedCompare($1.title) == .orderedAscending
+                }
         case .rating:
             return nfts.sorted { $0.rating > $1.rating }
         case .price:

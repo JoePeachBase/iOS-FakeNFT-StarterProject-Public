@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum Filter: String, CaseIterable {
+enum CartSortOption: String, CaseIterable {
     case price
     case rating
     case title

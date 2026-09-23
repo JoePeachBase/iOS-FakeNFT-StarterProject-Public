@@ -5,7 +5,7 @@
 //  Created by Мамытов Руслан on 15.09.2026.
 //
 
-struct NftUiModel {
+struct NftModel {
     let title: String
     let imageURL: String
     let rating: Int

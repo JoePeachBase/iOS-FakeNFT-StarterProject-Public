@@ -6,7 +6,7 @@
 //
 
 final class CartViewModel {
-    let state = Observable<ViewState<[NftUiModel]>>(.loading)
+    let state = Observable<ViewState<[NftModel]>>(.loading)
     
     func fetchOrder() {
         // TODO Добавить запрос
