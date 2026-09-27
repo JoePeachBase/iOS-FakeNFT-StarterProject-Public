@@ -15,3 +15,7 @@
 "Cart.filters.byRating" = "По рейтингу";
 "Cart.filters.byTitle" = "По названию";
 "Cart.filters.action.close" = "Закрыть";
+
+"Payment.button.title" = "Оплатить";
+"Payment.agreement.label" = "Совершая покупку, вы соглашаетесь с условиями";
+"Payment.agreement.link" = "Пользовательского соглашения";

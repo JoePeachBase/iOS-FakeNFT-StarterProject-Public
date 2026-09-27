@@ -94,6 +94,8 @@ final class CartViewController: UIViewController {
     }
     
     private func setupView() {
+        view.backgroundColor = .systemBackground
+        
         view.addSubview(tableView)
         view.addSubview(checkoutView)
         view.addSubview(emptyView)

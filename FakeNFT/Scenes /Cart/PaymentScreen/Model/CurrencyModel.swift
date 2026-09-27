@@ -6,8 +6,8 @@
 //
 import Foundation
 
-struct CurrencyUiModel {
-    let iconURL: URL
+struct CurrencyModel {
+    let imageURL: String
     let title: String
     let subtitle: String
 }
