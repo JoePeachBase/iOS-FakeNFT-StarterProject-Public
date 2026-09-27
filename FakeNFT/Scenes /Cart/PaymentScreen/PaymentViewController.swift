@@ -24,19 +24,17 @@ final class PaymentViewController: UIViewController {
             frame: .zero,
             collectionViewLayout: UICollectionViewFlowLayout()
         )
-        collection.isHidden = true
         collection.translatesAutoresizingMaskIntoConstraints = false
         return collection
     }()
     private let successPaymentView: UIView = {
         let view = SuccessPaymentView()
-        view.isHidden = false
+        view.isHidden = true
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     private lazy var paymentBottomView: PaymentBottomView = {
         let view = PaymentBottomView()
-        view.isHidden = true
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -96,6 +94,7 @@ final class PaymentViewController: UIViewController {
     }
     
     private func setupView() {
+        title = NSLocalizedString("Payment.title", comment: "")
         view.backgroundColor = .systemBackground
         
         view.addSubview(collectionView)

@@ -75,9 +75,7 @@ final class CartViewController: UIViewController {
         setupNavBar()
         setupView()
         setupTableView()
-        viewModel.state.bindListener { [weak self] state in
-            self?.listenState(state)
-        }
+        setupViewModel()
     }
     
     private func setupNavBar() {
@@ -99,6 +97,11 @@ final class CartViewController: UIViewController {
         view.addSubview(tableView)
         view.addSubview(checkoutView)
         view.addSubview(emptyView)
+        
+        checkoutView.onCheckoutButtonTapped = { [weak self] in
+            let paymentViewController = PaymentViewController()
+            self?.navigationController?.pushViewController(paymentViewController, animated: true)
+        }
         
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: view.topAnchor),
@@ -122,6 +125,12 @@ final class CartViewController: UIViewController {
     private func setupTableView() {
         tableView.dataSource = self
         tableView.register(CartItemCell.self)
+    }
+    
+    private func setupViewModel() {
+        viewModel.state.bindListener { [weak self] state in
+            self?.listenState(state)
+        }
     }
     
     private func listenState(_ state: ViewState<[NftModel]>) {

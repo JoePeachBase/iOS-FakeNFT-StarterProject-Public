@@ -37,7 +37,7 @@ final class TabBarController: UITabBarController {
     }
     
     private func getCartViewController() -> UIViewController {
-        let cartViewController = PaymentViewController()
+        let cartViewController = CartViewController()
         cartViewController.tabBarItem = cartTabBarItem
         
         return UINavigationController(rootViewController: cartViewController)
