@@ -24,11 +24,19 @@ final class PaymentViewController: UIViewController {
             frame: .zero,
             collectionViewLayout: UICollectionViewFlowLayout()
         )
+        collection.isHidden = true
         collection.translatesAutoresizingMaskIntoConstraints = false
         return collection
     }()
+    private let successPaymentView: UIView = {
+        let view = SuccessPaymentView()
+        view.isHidden = false
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
     private lazy var paymentBottomView: PaymentBottomView = {
         let view = PaymentBottomView()
+        view.isHidden = true
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -91,6 +99,7 @@ final class PaymentViewController: UIViewController {
         view.backgroundColor = .systemBackground
         
         view.addSubview(collectionView)
+        view.addSubview(successPaymentView)
         view.addSubview(paymentBottomView)
         
         NSLayoutConstraint.activate(
@@ -103,6 +112,11 @@ final class PaymentViewController: UIViewController {
                     .constraint(equalTo: view.trailingAnchor),
                 collectionView.bottomAnchor
                     .constraint(equalTo: paymentBottomView.topAnchor),
+                
+                successPaymentView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+                successPaymentView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+                successPaymentView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+                successPaymentView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
                 
                 paymentBottomView.leadingAnchor
                     .constraint(equalTo: view.leadingAnchor, constant: 16),

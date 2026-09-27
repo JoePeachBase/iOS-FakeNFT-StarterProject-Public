@@ -19,3 +19,5 @@
 "Payment.button.title" = "Оплатить";
 "Payment.agreement.label" = "Совершая покупку, вы соглашаетесь с условиями";
 "Payment.agreement.link" = "Пользовательского соглашения";
+"Payment.success.title" = "Успех! Оплата прошла,\nпоздравляем с покупкой!";
+"Payment.success.button" = "Вернуться в корзину";
