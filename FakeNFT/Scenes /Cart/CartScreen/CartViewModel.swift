@@ -5,8 +5,6 @@
 //  Created by Мамытов Руслан on 15.09.2026.
 //
 
-import UIKit
-
 enum CartEvent {
     case dataLoaded
     case nftDeleted(id: String)
@@ -60,8 +58,7 @@ final class CartViewModel: CartViewModelProtocol {
             guard let self else { return }
             
             switch result {
-            case .success(let response):
-                let order = getOrderUiModel(from: response)
+            case .success(let order):
                 state.value = .success(order)
                 event.value = .dataLoaded
             case .failure(let error):
@@ -87,29 +84,6 @@ final class CartViewModel: CartViewModelProtocol {
         
         state.value = .success(updatedModel)
         event.value = .nftDeleted(id: id)
-    }
-    
-    private func getOrderUiModel(from response: OrderResponse) -> OrderModel {
-        OrderModel(
-            id: response.id,
-            nfts: [
-                .init(
-                    id: "4342",
-                    title: "Что-то",
-                    imageURL: "https://code.s3.yandex.net/Mobile/iOS/NFT/Beige/April/1.png",
-                    rating: 4,
-                    formattedPrice: "7 ETH",
-                    price: 7
-                ),
-                .init(
-                    id: "44",
-                    title: "kek",
-                    imageURL: "https://code.s3.yandex.net/Mobile/iOS/NFT/Beige/April/1.png",
-                    rating: 2,
-                    formattedPrice: "3 ETH",
-                    price: 3
-                ),
-            ])
     }
     
     private func sort(_ nfts: [NftModel], with sortOption: CartSortOption) -> [NftModel] {

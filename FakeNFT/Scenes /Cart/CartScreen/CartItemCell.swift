@@ -150,12 +150,12 @@ final class CartItemCell: UITableViewCell, ReuseIdentifying {
         nftImageView.kf.cancelDownloadTask()
     }
     
-    func configure(with title: String, price: String, rating: Int, imageURL: String) {
+    func configure(with title: String, price: String, rating: Int, imageURL: URL?) {
         titleLabel.text = title
         priceLabel.text = price
         setRating(with: rating)
         nftImageView.kf.setImage(
-            with: URL(string: imageURL),
+            with: imageURL,
             placeholder: UIImage(resource: .deleteAlert)
         )
     }
