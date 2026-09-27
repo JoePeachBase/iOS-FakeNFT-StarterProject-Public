@@ -6,6 +6,7 @@
 //
 
 struct NftModel {
+    let id: String
     let title: String
     let imageURL: String
     let rating: Int

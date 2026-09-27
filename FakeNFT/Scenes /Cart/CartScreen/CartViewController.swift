@@ -7,10 +7,8 @@
 
 import UIKit
 
-final class CartViewController: UIViewController {
-    // MARK: - Private properties
-    private let viewModel = CartViewModel()
-    private let filtersService: CartSortOptionServiceProtocol = CartSortOptionService()
+final class CartViewController: UIViewController, LoadingView {
+    lazy var activityIndicator = UIActivityIndicatorView()
     
     private let emptyView: EmptyView = {
         let title = NSLocalizedString("Cart.empty.title", comment: "")
@@ -23,44 +21,27 @@ final class CartViewController: UIViewController {
         let table = UITableView(frame: .zero)
         table.separatorStyle = .none
         table.translatesAutoresizingMaskIntoConstraints = false
+        table.isHidden = true
         return table
     }()
     private let checkoutView: CheckoutBottomView = {
         let checkout = CheckoutBottomView()
         checkout.translatesAutoresizingMaskIntoConstraints = false
+        checkout.isHidden = true
         return checkout
     }()
+    private var viewModel: CartViewModelProtocol
     
-    private var nfts: [NftModel] = [
-        .init(
-            title: "Что-то",
-            imageURL: "https://code.s3.yandex.net/Mobile/iOS/NFT/Beige/April/1.png",
-            rating: 4,
-            formattedPrice: "7 ETH",
-            price: 7
-        ),
-        .init(
-            title: "April",
-            imageURL: "https://code.s3.yandex.net/Mobile/iOS/NFT/Beige/April/1.png",
-            rating: 1,
-            formattedPrice: "2 ETH",
-            price: 2
-        ),
-        .init(
-            title: "Greena",
-            imageURL: "https://code.s3.yandex.net/Mobile/iOS/NFT/Beige/April/1.png",
-            rating: 0,
-            formattedPrice: "3 ETH",
-            price: 3
-        ),
-        .init(
-            title: "Spring",
-            imageURL: "https://code.s3.yandex.net/Mobile/iOS/NFT/Beige/April/1.png",
-            rating: 5,
-            formattedPrice: "4 ETH",
-            price: 4
-        )
-    ]
+    // MARK: - Init
+    init(_ viewModel: CartViewModelProtocol) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        nil
+    }
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -68,6 +49,7 @@ final class CartViewController: UIViewController {
         
         setupUI()
         updateCheckoutBottomView()
+        viewModel.fetchOrder()
     }
     
     // MARK: - Private methods
@@ -94,6 +76,7 @@ final class CartViewController: UIViewController {
     private func setupView() {
         view.backgroundColor = .systemBackground
         
+        view.addSubview(activityIndicator)
         view.addSubview(tableView)
         view.addSubview(checkoutView)
         view.addSubview(emptyView)
@@ -103,6 +86,7 @@ final class CartViewController: UIViewController {
             self?.navigationController?.pushViewController(paymentViewController, animated: true)
         }
         
+        activityIndicator.constraintCenters(to: view)
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: view.topAnchor),
             tableView.bottomAnchor.constraint(equalTo: checkoutView.topAnchor),
@@ -131,10 +115,35 @@ final class CartViewController: UIViewController {
         viewModel.state.bindListener { [weak self] state in
             self?.listenState(state)
         }
+        viewModel.event.bindListener { [weak self] event in
+            guard let self, let event else { return }
+            listenEvent(event)
+        }
     }
     
-    private func listenState(_ state: ViewState<[NftModel]>) {
-        // TODO Добавить обработку стейта
+    private func listenState(_ state: ViewState<OrderModel>) {
+        let shouldShowContent = state.isSuccess && !state.isEmpty
+        tableView.isHidden = !shouldShowContent
+        checkoutView.isHidden = !shouldShowContent
+        emptyView.isHidden = !state.isEmpty
+        navigationController?.navigationBar.isHidden = state.isFailure || !shouldShowContent
+        
+        updateCheckoutBottomView()
+        
+        if state.isLoading {
+            showLoading()
+        } else {
+            hideLoading()
+        }
+    }
+    
+    private func listenEvent(_ event: CartEvent) {
+        switch event {
+        case .dataLoaded, .orderSorted:
+            tableView.reloadData()
+        default:
+            break
+        }
     }
     
     private func openFiltersSheet() {
@@ -150,14 +159,12 @@ final class CartViewController: UIViewController {
             preferredStyle: .actionSheet
         )
         
-        let currentFilter = filtersService.loadSortOption()
-        
         CartSortOption.allCases.forEach { sortOption in
-            let isCurrent = sortOption == currentFilter
+            let isCurrent = sortOption == viewModel.currentSortOption
             let actionTitle = isCurrent ? "\(sortOption.title)  ✓" : sortOption.title
             
             let action = UIAlertAction(title: actionTitle, style: .default) { [weak self] _ in
-                self?.handleFilterSelection(sortOption)
+                self?.viewModel.changeSortOption(sortOption)
             }
             actionSheet.addAction(action)
         }
@@ -176,59 +183,33 @@ final class CartViewController: UIViewController {
         return actionSheet
     }
     
-    private func handleFilterSelection(_ sortOption: CartSortOption) {
-        filtersService.saveSortOption(sortOption)
-        nfts = sort(nfts, with: sortOption)
-        
-        UIView.transition(
-            with: tableView,
-            duration: 0.2,
-            options: .transitionCrossDissolve
-        ) {
-            self.tableView.reloadData()
-        }
-    }
-    
     private func deleteNft(at indexPath: IndexPath) {
-        guard indexPath.row < nfts.count else { return }
+        guard indexPath.row < viewModel.nfts.count else { return }
+        let nftToDelete = viewModel.nfts[indexPath.row]
         
         tableView.performBatchUpdates {
-            nfts.remove(at: indexPath.row)
+            viewModel.deleteNft(with: nftToDelete.id)
             tableView.deleteRows(at: [indexPath], with: .fade)
-        } completion: { [weak self] _ in
-            guard let self else { return }
-            
-            if nfts.isEmpty {
-                emptyView.isHidden = false
-            }
-            updateCheckoutBottomView()
         }
     }
     
     private func updateCheckoutBottomView() {
-        let totalCount = nfts.count
-        let totalSum = nfts.reduce(0) { $0 + $1.price }
-        
-        let countText = "\(totalCount) NFT"
-        let priceText = "\(totalSum) ETH"
-        
         checkoutView.configure(
-            countText: countText,
-            priceText: priceText
+            countText: viewModel.totalCountText,
+            priceText: viewModel.totalSumText
         )
-        checkoutView.isHidden = nfts.isEmpty
     }
 }
 
 // MARK: - UITableViewDataSource extension
 extension CartViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        nfts.count
+        viewModel.nfts.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: CartItemCell = tableView.dequeueReusableCell()
-        let nft = nfts[indexPath.row]
+        let nft = viewModel.nfts[indexPath.row]
         
         cell.configure(
             with: nft.title,
@@ -246,10 +227,6 @@ extension CartViewController: UITableViewDataSource {
         return cell
     }
     
-    private func configureCell() {
-        
-    }
-    
     private func showDeleteMenu(_ indexPath: IndexPath) {
         let menuViewController = CartDeleteItemMenuViewController()
         let text = NSLocalizedString("Cart.menu.delete.title", comment: "")
@@ -264,22 +241,5 @@ extension CartViewController: UITableViewDataSource {
         menuViewController.modalTransitionStyle = .crossDissolve
         
         present(menuViewController, animated: true)
-    }
-}
-
-// MARK: - NFT sorting by filter
-extension CartViewController {
-    func sort(_ nfts: [NftModel], with sortOption: CartSortOption) -> [NftModel] {
-        switch sortOption {
-        case .title:
-            return nfts
-                .sorted {
-                    $0.title.localizedCompare($1.title) == .orderedAscending
-                }
-        case .rating:
-            return nfts.sorted { $0.rating > $1.rating }
-        case .price:
-            return nfts.sorted { $0.price < $1.price }
-        }
     }
 }
