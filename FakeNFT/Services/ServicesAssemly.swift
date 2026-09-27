@@ -28,4 +28,8 @@ final class ServicesAssembly {
     var cartSortService: CartSortOptionServiceProtocol {
         CartSortOptionService()
     }
+    
+    var currencyService: CurrencyServiceProtocol {
+        CurrencyService(networkClient: networkClient)
+    }
 }

@@ -31,10 +31,15 @@ final class CartViewController: UIViewController, LoadingView {
         return checkout
     }()
     private var viewModel: CartViewModelProtocol
+    private var paymentAssembly: PaymentAssembly
     
     // MARK: - Init
-    init(_ viewModel: CartViewModelProtocol) {
+    init(
+        viewModel: CartViewModelProtocol,
+        paymentAssembly: PaymentAssembly
+    ) {
         self.viewModel = viewModel
+        self.paymentAssembly = paymentAssembly
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -82,8 +87,10 @@ final class CartViewController: UIViewController, LoadingView {
         view.addSubview(emptyView)
         
         checkoutView.onCheckoutButtonTapped = { [weak self] in
-            let paymentViewController = PaymentViewController()
-            self?.navigationController?.pushViewController(paymentViewController, animated: true)
+            guard let self else { return }
+            
+            let paymentViewController = paymentAssembly.build()
+            navigationController?.pushViewController(paymentViewController, animated: true)
         }
         
         activityIndicator.constraintCenters(to: view)
@@ -123,6 +130,7 @@ final class CartViewController: UIViewController, LoadingView {
     
     private func listenState(_ state: ViewState<OrderModel>) {
         let shouldShowContent = state.isSuccess && !state.isEmpty
+        
         tableView.isHidden = !shouldShowContent
         checkoutView.isHidden = !shouldShowContent
         emptyView.isHidden = !state.isEmpty

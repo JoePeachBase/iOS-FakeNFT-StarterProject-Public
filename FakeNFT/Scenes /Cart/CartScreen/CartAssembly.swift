@@ -9,9 +9,14 @@ import UIKit
 
 final class CartAssembly {
     private let servicesAssembler: ServicesAssembly
+    private let paymentAssembly: PaymentAssembly
     
-    init(servicesAssembler: ServicesAssembly) {
+    init(
+        servicesAssembler: ServicesAssembly,
+        paymentAssembly: PaymentAssembly
+    ) {
         self.servicesAssembler = servicesAssembler
+        self.paymentAssembly = paymentAssembly
     }
     
     func build() -> UIViewController {
@@ -19,6 +24,6 @@ final class CartAssembly {
             orderService: servicesAssembler.orderService,
             sortService: servicesAssembler.cartSortService
         )
-        return CartViewController(viewModel)
+        return CartViewController(viewModel: viewModel, paymentAssembly: paymentAssembly)
     }
 }

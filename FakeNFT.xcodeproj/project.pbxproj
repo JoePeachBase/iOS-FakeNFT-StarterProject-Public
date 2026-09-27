@@ -46,6 +46,9 @@
 		285708993069290600940F06 /* CartOrderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285708983069290200940F06 /* CartOrderService.swift */; };
 		2857089C3069336300940F06 /* Order.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2857089B3069336100940F06 /* Order.swift */; };
 		285708A03069741200940F06 /* CartAssembly.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2857089F3069740900940F06 /* CartAssembly.swift */; };
+		285708A530699ED200940F06 /* CurrencyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285708A430699ECC00940F06 /* CurrencyService.swift */; };
+		285708A730699F5C00940F06 /* Currency.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285708A630699F5900940F06 /* Currency.swift */; };
+		285708A93069A58100940F06 /* PaymentAssembly.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285708A83069A57C00940F06 /* PaymentAssembly.swift */; };
 		3F478ECF29DB474E00F6D39E /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F478ECE29DB474E00F6D39E /* Colors.swift */; };
 		3F478ED129DB476500F6D39E /* Fonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F478ED029DB476500F6D39E /* Fonts.swift */; };
 		3F603CCD29DB4A53000C43D7 /* ProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = 3F603CCC29DB4A53000C43D7 /* ProgressHUD */; };
@@ -128,6 +131,9 @@
 		285708983069290200940F06 /* CartOrderService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartOrderService.swift; sourceTree = "<group>"; };
 		2857089B3069336100940F06 /* Order.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Order.swift; sourceTree = "<group>"; };
 		2857089F3069740900940F06 /* CartAssembly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartAssembly.swift; sourceTree = "<group>"; };
+		285708A430699ECC00940F06 /* CurrencyService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyService.swift; sourceTree = "<group>"; };
+		285708A630699F5900940F06 /* Currency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Currency.swift; sourceTree = "<group>"; };
+		285708A83069A57C00940F06 /* PaymentAssembly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentAssembly.swift; sourceTree = "<group>"; };
 		3F478ECE29DB474E00F6D39E /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
 		3F478ED029DB476500F6D39E /* Fonts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fonts.swift; sourceTree = "<group>"; };
 		3F68069329CBBAF100B4F915 /* FakeNFT.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FakeNFT.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -253,13 +259,13 @@
 		2846E8B9305978B3007F37F9 /* CartScreen */ = {
 			isa = PBXGroup;
 			children = (
-				2857089F3069740900940F06 /* CartAssembly.swift */,
-				2846E8F63059D8C9007F37F9 /* Views */,
-				2846E8CE3059841C007F37F9 /* Models */,
 				2846E8D63059AA76007F37F9 /* CartDeleteItemMenuViewController.swift */,
 				2846E8D230598FA9007F37F9 /* CartItemCell.swift */,
 				2846E8C230597BE1007F37F9 /* CartViewModel.swift */,
 				2846E8C030597BCD007F37F9 /* CartViewController.swift */,
+				2857089F3069740900940F06 /* CartAssembly.swift */,
+				2846E8F63059D8C9007F37F9 /* Views */,
+				2846E8CE3059841C007F37F9 /* Models */,
 			);
 			path = CartScreen;
 			sourceTree = "<group>";
@@ -267,10 +273,11 @@
 		2846E8BA305978BA007F37F9 /* PaymentScreen */ = {
 			isa = PBXGroup;
 			children = (
-				2857088C3068FFBC00940F06 /* View */,
+				285708A83069A57C00940F06 /* PaymentAssembly.swift */,
 				2857088A3068205B00940F06 /* CurrencyCell.swift */,
 				2857088830681F6500940F06 /* PaymentViewModel.swift */,
 				2857088630681F4E00940F06 /* PaymentViewController.swift */,
+				2857088C3068FFBC00940F06 /* View */,
 				2846E8CD3059840B007F37F9 /* Model */,
 			);
 			path = PaymentScreen;
@@ -341,6 +348,7 @@
 				2857089A3069333300940F06 /* Model */,
 				285708983069290200940F06 /* CartOrderService.swift */,
 				2846E8F13059CE0C007F37F9 /* CartSortOptionService.swift */,
+				285708A430699ECC00940F06 /* CurrencyService.swift */,
 			);
 			path = Cart;
 			sourceTree = "<group>";
@@ -348,6 +356,7 @@
 		2857089A3069333300940F06 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				285708A630699F5900940F06 /* Currency.swift */,
 				2857089B3069336100940F06 /* Order.swift */,
 				2846E8ED3059BA0D007F37F9 /* CartSortOption.swift */,
 			);
@@ -672,12 +681,14 @@
 				2846E8BE305979A0007F37F9 /* OrderModel.swift in Sources */,
 				2846E8D530599D95007F37F9 /* CheckoutBottomView.swift in Sources */,
 				2846E8D130598AC4007F37F9 /* EmptyView.swift in Sources */,
+				285708A530699ED200940F06 /* CurrencyService.swift in Sources */,
 				3FC8C38B29D242E90081F015 /* ProductDetailsTableViewCell.swift in Sources */,
 				2846E8C130597BD2007F37F9 /* CartViewController.swift in Sources */,
 				3F478ECF29DB474E00F6D39E /* Colors.swift in Sources */,
 				2846E8B83059772D007F37F9 /* NftModel.swift in Sources */,
 				2857088730681F5400940F06 /* PaymentViewController.swift in Sources */,
 				0C79EE662A76DDFF00EE90EA /* NftDetailViewController.swift in Sources */,
+				285708A730699F5C00940F06 /* Currency.swift in Sources */,
 				E1A1B9DA2AA01CE400C3AFBC /* TabBarController.swift in Sources */,
 				3F478ED129DB476500F6D39E /* Fonts.swift in Sources */,
 				2846E8EE3059BA0D007F37F9 /* CartSortOption.swift in Sources */,
@@ -699,6 +710,7 @@
 				558E39E72C68CE0A00FB86AC /* NftService.swift in Sources */,
 				3F68069729CBBAF100B4F915 /* AppDelegate.swift in Sources */,
 				2857088B3068205E00940F06 /* CurrencyCell.swift in Sources */,
+				285708A93069A58100940F06 /* PaymentAssembly.swift in Sources */,
 				2846E8D330598FB3007F37F9 /* CartItemCell.swift in Sources */,
 				3F68069929CBBAF100B4F915 /* SceneDelegate.swift in Sources */,
 				2846E8BC305978D2007F37F9 /* CurrencyModel.swift in Sources */,

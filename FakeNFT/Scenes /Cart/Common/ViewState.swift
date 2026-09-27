@@ -13,7 +13,7 @@ enum ViewState<T> {
     case empty
 }
 
-extension ViewState where T == OrderModel {
+extension ViewState {
     var isSuccess: Bool {
         if case .success = self { return true }
         return false
@@ -28,7 +28,18 @@ extension ViewState where T == OrderModel {
         if case .loading = self { return true }
         return false
     }
-    
+}
+
+extension ViewState where T: Collection {
+    var isEmpty: Bool {
+        if case .success(let collection) = self {
+            return collection.isEmpty
+        }
+        return false
+    }
+}
+
+extension ViewState where T == OrderModel {
     var isEmpty: Bool {
         if case .success(let model) = self {
             return model.nfts.isEmpty

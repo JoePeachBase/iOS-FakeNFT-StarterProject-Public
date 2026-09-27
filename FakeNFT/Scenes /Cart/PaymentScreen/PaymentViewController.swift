@@ -11,7 +11,9 @@ enum PaymentViewControllerConstants {
     static let userAgreementURL = "https://yandex.ru/legal/practicum_termsofuse"
 }
 
-final class PaymentViewController: UIViewController {
+final class PaymentViewController: UIViewController, LoadingView {
+    lazy var activityIndicator = UIActivityIndicatorView()
+    
     // MARK: - Private properties
     private let collectionViewParams = GeometricParams(
         columnCount: 2,
@@ -24,6 +26,7 @@ final class PaymentViewController: UIViewController {
             frame: .zero,
             collectionViewLayout: UICollectionViewFlowLayout()
         )
+        collection.isHidden = true
         collection.translatesAutoresizingMaskIntoConstraints = false
         return collection
     }()
@@ -35,48 +38,28 @@ final class PaymentViewController: UIViewController {
     }()
     private lazy var paymentBottomView: PaymentBottomView = {
         let view = PaymentBottomView()
+        view.isHidden = true
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
-    private let viewModel = PaymentViewModel()
-    private let currencies = [
-        CurrencyModel(
-            imageURL: "https://code.s3.yandex.net/Mobile/iOS/Currencies/Bitcoin_(BTC).png." ,
-            title: "Bitcoin",
-            subtitle: "BTC"
-        ),
-        CurrencyModel(
-            imageURL: "https://code.s3.yandex.net/Mobile/iOS/Currencies/Bitcoin_(BTC).png." ,
-            title: "Tether",
-            subtitle: "USDT"
-        ),
-        CurrencyModel(
-            imageURL: "https://code.s3.yandex.net/Mobile/iOS/Currencies/Bitcoin_(BTC).png." ,
-            title: "Solana",
-            subtitle: "SOL"
-        ),
-        CurrencyModel(
-            imageURL: "https://code.s3.yandex.net/Mobile/iOS/Currencies/Bitcoin_(BTC).png." ,
-            title: "Cardano",
-            subtitle: "ADA"
-        ),
-        CurrencyModel(
-            imageURL: "https://code.s3.yandex.net/Mobile/iOS/Currencies/Bitcoin_(BTC).png." ,
-            title: "Shiba Inu",
-            subtitle: "SHIB"
-        ),
-        CurrencyModel(
-            imageURL: "https://code.s3.yandex.net/Mobile/iOS/Currencies/Bitcoin_(BTC).png." ,
-            title: "Apecoin",
-            subtitle: "APE"
-        )
-    ]
+    private var viewModel: PaymentViewModelProtocol
+    
+    init(_ viewModel: PaymentViewModelProtocol) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        nil
+    }
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        viewModel.fetchCurrencies()
     }
     
     // MARK: - Private methods
@@ -97,10 +80,12 @@ final class PaymentViewController: UIViewController {
         title = NSLocalizedString("Payment.title", comment: "")
         view.backgroundColor = .systemBackground
         
+        view.addSubview(activityIndicator)
         view.addSubview(collectionView)
         view.addSubview(successPaymentView)
         view.addSubview(paymentBottomView)
         
+        activityIndicator.constraintCenters(to: view)
         NSLayoutConstraint.activate(
             [
                 collectionView.topAnchor
@@ -167,21 +152,34 @@ final class PaymentViewController: UIViewController {
     }
     
     private func listenState(_ state: ViewState<[CurrencyModel]>) {
-        // TODO Добавить обработку стейта
+        let shouldShowContent = state.isSuccess && !state.isEmpty
+        
+        collectionView.isHidden = !shouldShowContent
+        paymentBottomView.isHidden = !shouldShowContent
+        
+        if state.isLoading {
+            showLoading()
+        } else {
+            hideLoading()
+        }
+        
+        if case .success = state {
+            collectionView.reloadData()
+        }
     }
 }
 
 // MARK: - UICollectionViewDataSource
 extension PaymentViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        currencies.count
+        viewModel.currencies.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell: CurrencyCell = collectionView.dequeueReusableCell(
             indexPath: indexPath
         )
-        let currency = currencies[indexPath.row]
+        let currency = viewModel.currencies[indexPath.row]
         
         cell
             .configure(
