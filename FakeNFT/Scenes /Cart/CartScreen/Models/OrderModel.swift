@@ -6,6 +6,6 @@
 //
 
 struct OrderModel {
-    let totalNfts: String
-    let totalSum: String
+    let id: String
+    let nfts: [NftModel]
 }

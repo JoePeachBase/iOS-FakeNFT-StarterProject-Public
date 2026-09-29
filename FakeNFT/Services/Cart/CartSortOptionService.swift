@@ -14,7 +14,11 @@ protocol CartSortOptionServiceProtocol: AnyObject {
 
 final class CartSortOptionService: CartSortOptionServiceProtocol {
     private let userDefaultsKey = "cart_filter"
-    private let userDefaults = UserDefaults.standard
+    private let userDefaults: UserDefaults
+    
+    init(userDefaults: UserDefaults = .standard) {
+        self.userDefaults = userDefaults
+    }
     
     func saveSortOption(_ option: CartSortOption) {
         userDefaults.set(option.rawValue, forKey: userDefaultsKey)
