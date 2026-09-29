@@ -30,7 +30,7 @@ final class CartViewModel: CartViewModelProtocol {
     var currentSortOption: CartSortOption
     
     private let orderId: String
-    private let orderService: CartOrderServiceProtocol
+    private let orderService: CartServiceProtocol
     private let sortService: CartSortOptionServiceProtocol
     
     var nfts: [NftModel] {
@@ -49,7 +49,7 @@ final class CartViewModel: CartViewModelProtocol {
     
     init(
         orderId: String,
-        orderService: CartOrderServiceProtocol,
+        orderService: CartServiceProtocol,
         sortService: CartSortOptionServiceProtocol
     ) {
         self.orderId = orderId
@@ -73,23 +73,28 @@ final class CartViewModel: CartViewModelProtocol {
         }
     }
     
+    func deleteNft(with id: String) {
+        let updatedNftIds = nfts
+            .filter { $0.id != id }
+            .map { $0.id }
+        
+        orderService.updateOrder(id: orderId, nfts: updatedNftIds) { [weak self] result in
+            guard let self else { return }
+            
+            switch result {
+            case .success:
+                fetchOrder()
+            case .failure(let error):
+                // TODO добавить обработку ошибки
+            }
+        }
+    }
+    
     func changeSortOption(_ sortOption: CartSortOption) {
         sortService.saveSortOption(sortOption)
         currentSortOption = sortOption
         
         event.value = .orderSorted
-    }
-    
-    func deleteNft(with id: String) {
-        guard case .success(let currentModel) = state.value else {
-            return
-        }
-        
-        let updatedNfts = currentModel.nfts.filter { $0.id != id }
-        let updatedModel = OrderModel(id: currentModel.id, nfts: updatedNfts)
-        
-        state.value = .success(updatedModel)
-        event.value = .nftDeleted(id: id)
     }
     
     private func sort(_ nfts: [NftModel], with sortOption: CartSortOption) -> [NftModel] {

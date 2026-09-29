@@ -43,7 +43,7 @@
 		2857089130690BF400940F06 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2857089030690BEF00940F06 /* WebViewController.swift */; };
 		2857089430691E6800940F06 /* GeometricParams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2857089330691E6800940F06 /* GeometricParams.swift */; };
 		285708963069215D00940F06 /* SuccessPaymentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285708953069215700940F06 /* SuccessPaymentView.swift */; };
-		285708993069290600940F06 /* CartOrderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285708983069290200940F06 /* CartOrderService.swift */; };
+		285708993069290600940F06 /* CartService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285708983069290200940F06 /* CartService.swift */; };
 		2857089C3069336300940F06 /* Order.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2857089B3069336100940F06 /* Order.swift */; };
 		285708A03069741200940F06 /* CartAssembly.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2857089F3069740900940F06 /* CartAssembly.swift */; };
 		285708A530699ED200940F06 /* CurrencyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285708A430699ECC00940F06 /* CurrencyService.swift */; };
@@ -128,7 +128,7 @@
 		2857089030690BEF00940F06 /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
 		2857089330691E6800940F06 /* GeometricParams.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeometricParams.swift; sourceTree = "<group>"; };
 		285708953069215700940F06 /* SuccessPaymentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuccessPaymentView.swift; sourceTree = "<group>"; };
-		285708983069290200940F06 /* CartOrderService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartOrderService.swift; sourceTree = "<group>"; };
+		285708983069290200940F06 /* CartService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartService.swift; sourceTree = "<group>"; };
 		2857089B3069336100940F06 /* Order.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Order.swift; sourceTree = "<group>"; };
 		2857089F3069740900940F06 /* CartAssembly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartAssembly.swift; sourceTree = "<group>"; };
 		285708A430699ECC00940F06 /* CurrencyService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyService.swift; sourceTree = "<group>"; };
@@ -259,13 +259,13 @@
 		2846E8B9305978B3007F37F9 /* CartScreen */ = {
 			isa = PBXGroup;
 			children = (
-				2846E8D63059AA76007F37F9 /* CartDeleteItemMenuViewController.swift */,
 				2846E8D230598FA9007F37F9 /* CartItemCell.swift */,
 				2846E8C230597BE1007F37F9 /* CartViewModel.swift */,
 				2846E8C030597BCD007F37F9 /* CartViewController.swift */,
 				2857089F3069740900940F06 /* CartAssembly.swift */,
 				2846E8F63059D8C9007F37F9 /* Views */,
 				2846E8CE3059841C007F37F9 /* Models */,
+				2846E8D63059AA76007F37F9 /* CartDeleteItemMenuViewController.swift */,
 			);
 			path = CartScreen;
 			sourceTree = "<group>";
@@ -346,7 +346,7 @@
 			isa = PBXGroup;
 			children = (
 				2857089A3069333300940F06 /* Model */,
-				285708983069290200940F06 /* CartOrderService.swift */,
+				285708983069290200940F06 /* CartService.swift */,
 				2846E8F13059CE0C007F37F9 /* CartSortOptionService.swift */,
 				285708A430699ECC00940F06 /* CurrencyService.swift */,
 			);
@@ -676,7 +676,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				285708993069290600940F06 /* CartOrderService.swift in Sources */,
+				285708993069290600940F06 /* CartService.swift in Sources */,
 				2857088E3068FFCA00940F06 /* PaymentBottomView.swift in Sources */,
 				2846E8BE305979A0007F37F9 /* OrderModel.swift in Sources */,
 				2846E8D530599D95007F37F9 /* CheckoutBottomView.swift in Sources */,

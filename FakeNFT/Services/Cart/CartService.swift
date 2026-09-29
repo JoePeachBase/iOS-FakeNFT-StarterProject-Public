@@ -8,12 +8,14 @@
 import Foundation
 
 typealias OrderCompletion = (Result<OrderModel, Error>) -> Void
+typealias UpdateOrderCompletion = (Result<Void, Error>) -> Void
 
-protocol CartOrderServiceProtocol {
+protocol CartServiceProtocol {
     func fetchOrder(id: String, completion: @escaping OrderCompletion)
+    func updateOrder(id: String, nfts: [String], completion: @escaping UpdateOrderCompletion)
 }
 
-final class CartOrderService: CartOrderServiceProtocol {
+final class CartService: CartServiceProtocol {
     private let networkClient: NetworkClient
     private let nftService: NftService
     private let serialQueue = DispatchQueue(label: "com.app.cartServiceSerialQueue")
@@ -27,7 +29,7 @@ final class CartOrderService: CartOrderServiceProtocol {
     }
     
     func fetchOrder(id: String, completion: @escaping OrderCompletion) {
-        let request = OrderRequest(id: id)
+        let request = OrderRequest.get(id: id)
         
         networkClient.send(request: request, type: OrderResponse.self) { result in
             switch result {
@@ -41,6 +43,20 @@ final class CartOrderService: CartOrderServiceProtocol {
                     }
                 }
             case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    func updateOrder(id: String, nfts: [String], completion: @escaping UpdateOrderCompletion) {
+        let request = OrderRequest.put(id: id, nfts: nfts)
+        
+        networkClient.send(request: request) { result in
+            switch result {
+            case .success:
+                completion(.success(()))
+            case .failure(let error):
+                print(error.localizedDescription)
                 completion(.failure(error))
             }
         }

@@ -194,11 +194,7 @@ final class CartViewController: UIViewController, LoadingView {
     private func deleteNft(at indexPath: IndexPath) {
         guard indexPath.row < viewModel.nfts.count else { return }
         let nftToDelete = viewModel.nfts[indexPath.row]
-        
-        tableView.performBatchUpdates {
-            viewModel.deleteNft(with: nftToDelete.id)
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        }
+        viewModel.deleteNft(with: nftToDelete.id)
     }
     
     private func updateCheckoutBottomView() {
