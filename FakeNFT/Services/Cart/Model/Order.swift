@@ -15,11 +15,7 @@ protocol OrderBaseRequestModel: NetworkRequest {
 extension OrderBaseRequestModel {
     var endpoint: URL? {
         guard let baseUrl = URL(string: RequestConstants.baseURL) else { return nil }
-        return baseUrl
-            .appendingPathComponent("api")
-            .appendingPathComponent("v1")
-            .appendingPathComponent("orders")
-            .appendingPathComponent(id)
+        return baseUrl.appending(path: "api/v1/orders/\(id)", directoryHint: .notDirectory)
     }
 }
 

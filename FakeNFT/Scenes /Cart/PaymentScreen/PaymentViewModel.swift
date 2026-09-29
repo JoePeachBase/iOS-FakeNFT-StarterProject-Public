@@ -7,6 +7,7 @@
 
 protocol PaymentViewModelProtocol {
     var state: Observable<ViewState<[CurrencyModel]>> { get }
+    var paymentState: Observable<ViewState<Void>> { get }
     var currencies: [CurrencyModel] { get }
     var selectedCurrencyId: String? { get }
     
@@ -17,21 +18,30 @@ protocol PaymentViewModelProtocol {
 
 final class PaymentViewModel: PaymentViewModelProtocol {
     let state = Observable<ViewState<[CurrencyModel]>>(.idle)
+    let paymentState = Observable<ViewState<Void>>(.idle)
     var selectedCurrencyId: String?
-    private let service: CurrencyServiceProtocol
+    private let orderId: String
+    private let cartService: CartServiceProtocol
+    private let currencyService: CurrencyServiceProtocol
     
     var currencies: [CurrencyModel] {
         guard case .success(let currencies) = state.value else { return [] }
         return currencies
     }
     
-    init(_ service: CurrencyServiceProtocol) {
-        self.service = service
+    init(
+        orderId: String,
+        cartService: CartServiceProtocol,
+        currencyService: CurrencyServiceProtocol
+    ) {
+        self.orderId = orderId
+        self.cartService = cartService
+        self.currencyService = currencyService
     }
     
     func fetchCurrencies() {
         state.value = .loading
-        service.fetchCurrencies { [weak self] result in
+        currencyService.fetchCurrencies { [weak self] result in
             guard let self else { return }
             
             switch result {
@@ -52,6 +62,32 @@ final class PaymentViewModel: PaymentViewModelProtocol {
     }
     
     func makePayment() {
+        guard let selectedCurrencyId else { return }
         
+        paymentState.value = .loading
+        cartService.makePayment(id: orderId, currencyId: selectedCurrencyId) { [weak self] result in
+            guard let self else { return }
+            
+            switch result {
+            case .success:
+                updateOrder()
+            case .failure(let error):
+                paymentState.value = .failure(error)
+            }
+        }
     }
+    
+    private func updateOrder() {
+        cartService.updateOrder(id: orderId, nfts: []) { [weak self] result in
+            guard let self else { return }
+            
+            switch result {
+            case .success:
+                paymentState.value = .success(())
+            case .failure(let error):
+                paymentState.value = .failure(error)
+            }
+        }
+    }
+
 }

@@ -11,7 +11,7 @@ enum PaymentViewControllerConstants {
     static let userAgreementURL = "https://yandex.ru/legal/practicum_termsofuse"
 }
 
-final class PaymentViewController: UIViewController, LoadingView {
+final class PaymentViewController: UIViewController, LoadingView, ErrorView {
     lazy var activityIndicator = UIActivityIndicatorView()
     
     // MARK: - Private properties
@@ -30,7 +30,7 @@ final class PaymentViewController: UIViewController, LoadingView {
         collection.translatesAutoresizingMaskIntoConstraints = false
         return collection
     }()
-    private let successPaymentView: UIView = {
+    private let successPaymentView: SuccessPaymentView = {
         let view = SuccessPaymentView()
         view.isHidden = true
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -62,17 +62,26 @@ final class PaymentViewController: UIViewController, LoadingView {
         viewModel.fetchCurrencies()
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
+    }
+    
     // MARK: - Private methods
     private func setupUI() {
         setupView()
         setupCollectionView()
         setupViewModel()
         setupPaymentBottomView()
+        setupSuccessPaymentView()
     }
     
     private func setupViewModel() {
         viewModel.state.bindListener { [weak self] state in
             self?.listenState(state)
+        }
+        viewModel.paymentState.bindListener { [weak self] state in
+            self?.listenPaymentState(state)
         }
     }
     
@@ -158,21 +167,60 @@ final class PaymentViewController: UIViewController, LoadingView {
         collectionView.delegate = self
     }
     
+    private func setupSuccessPaymentView() {
+        successPaymentView.onBackButtonTap = { [weak self] in
+            self?.navigationController?.popViewController(animated: true)
+        }
+    }
+    
     private func listenState(_ state: ViewState<[CurrencyModel]>) {
         let shouldShowContent = state.isSuccess && !state.isEmpty
         
+        toggleLoading(state)
         collectionView.isHidden = !shouldShowContent
         paymentBottomView.isHidden = !shouldShowContent
         
+        if case .success = state {
+            collectionView.reloadData()
+        }
+        if case .failure(let error) = state {
+            handleError(error) { [weak self] in
+                self?.viewModel.fetchCurrencies()
+            }
+        }
+    }
+    
+    private func listenPaymentState(_ state: ViewState<Void>) {
+        let shouldShowSuccessView = state.isSuccess
+        
+        toggleLoading(state)
+        successPaymentView.isHidden = !shouldShowSuccessView
+        collectionView.isHidden = shouldShowSuccessView
+        paymentBottomView.isHidden = shouldShowSuccessView
+        navigationController?.setNavigationBarHidden(shouldShowSuccessView, animated: false)
+        
+        if case .failure(let error) = state {
+            handleError(error) { [weak self] in
+                self?.viewModel.makePayment()
+            }
+        }
+    }
+    
+    private func toggleLoading<T>(_ state: ViewState<T>) {
         if state.isLoading {
             showLoading()
         } else {
             hideLoading()
         }
-        
-        if case .success = state {
-            collectionView.reloadData()
-        }
+    }
+    
+    private func handleError(_ error: Error, action: @escaping () -> Void) {
+        let model = ErrorModel(
+            message: error.localizedDescription,
+            actionText: NSLocalizedString("Error.repeat", comment: ""),
+            action: action
+        )
+        showError(model)
     }
 }
 
@@ -223,7 +271,7 @@ extension PaymentViewController: UICollectionViewDelegateFlowLayout {
         
         if let previousIndex = previousSelectedIndex {
             let previousIndexPath = IndexPath(row: previousIndex, section: 0)
-
+            
             if let previousCell = getCurrencyCell(at: previousIndexPath) {
                 previousCell.configureCellBorder(isVisible: false)
             }

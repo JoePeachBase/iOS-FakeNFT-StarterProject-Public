@@ -9,6 +9,8 @@ import UIKit
 
 final class SuccessPaymentView: UIView {
     
+    var onBackButtonTap: (() -> Void)?
+    
     private let stackView: UIStackView = {
         let stack = UIStackView()
         stack.axis = .vertical
@@ -36,7 +38,11 @@ final class SuccessPaymentView: UIView {
         return label
     }()
     
-    private let backButton: UIButton = {
+    private lazy var backButton: UIButton = {
+        let action = UIAction { [weak self] _ in
+            self?.onBackButtonTap?()
+        }
+        
         let title = NSLocalizedString("Payment.success.button", comment: "")
         var configuration = UIButton.Configuration.filled()
         configuration.background.cornerRadius = 16
@@ -47,7 +53,10 @@ final class SuccessPaymentView: UIView {
         container.font = .systemFont(ofSize: 17, weight: .bold)
         configuration.attributedTitle = AttributedString(title, attributes: container)
         
-        let button = UIButton(configuration: configuration)
+        let button = UIButton(
+            configuration: configuration,
+            primaryAction: action
+        )
         
         button.translatesAutoresizingMaskIntoConstraints = false
         return button

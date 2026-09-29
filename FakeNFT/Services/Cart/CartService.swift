@@ -7,12 +7,27 @@
 
 import Foundation
 
+enum CartServiceError: Error {
+    case paymentError
+}
+
+extension CartServiceError: LocalizedError {
+    var errorDescription: String? {
+        switch self {
+        case .paymentError:
+            NSLocalizedString("Payment.error.message", comment: "")
+        }
+    }
+}
+
 typealias OrderCompletion = (Result<OrderModel, Error>) -> Void
 typealias UpdateOrderCompletion = (Result<Void, Error>) -> Void
+typealias PaymentCompletion = (Result<Void, Error>) -> Void
 
 protocol CartServiceProtocol {
     func fetchOrder(id: String, completion: @escaping OrderCompletion)
     func updateOrder(id: String, nfts: [String], completion: @escaping UpdateOrderCompletion)
+    func makePayment(id: String, currencyId: String, completion: @escaping PaymentCompletion)
 }
 
 final class CartService: CartServiceProtocol {
@@ -62,6 +77,21 @@ final class CartService: CartServiceProtocol {
         }
     }
     
+    func makePayment(id: String, currencyId: String, completion: @escaping PaymentCompletion) {
+        let request = PaymentRequest(id: id, currencyId: currencyId)
+        
+        networkClient.send(request: request, type: PaymentResponse.self) { result in
+            switch result {
+            case .success(let response):
+                response.success
+                ? completion(.success(()))
+                : completion(.failure(CartServiceError.paymentError))
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+    
     private func fetchNfts(by ids: [String], completion: @escaping (Result<[Nft], Error>) -> Void) {
         guard !ids.isEmpty else {
             completion(.success([]))
@@ -78,15 +108,15 @@ final class CartService: CartServiceProtocol {
             nftService.loadNft(id: id) { [weak self] result in
                 defer { group.leave() }
                 
-                guard let self = self else { return }
+                guard let self else { return }
                 
                 switch result {
                 case .success(let nft):
-                    self.serialQueue.async {
+                    serialQueue.async {
                         loadedNfts.append(nft)
                     }
                 case .failure(let error):
-                    self.serialQueue.async {
+                    serialQueue.async {
                         if firstError == nil { firstError = error }
                     }
                 }

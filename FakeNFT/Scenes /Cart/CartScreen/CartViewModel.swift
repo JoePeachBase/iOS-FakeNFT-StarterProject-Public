@@ -17,6 +17,7 @@ protocol CartViewModelProtocol {
     var nfts: [NftModel] { get }
     var totalCountText: String { get }
     var totalSumText: String{ get }
+    var orderId: String { get }
     var currentSortOption: CartSortOption { get }
     
     func fetchOrder()
@@ -27,9 +28,9 @@ protocol CartViewModelProtocol {
 final class CartViewModel: CartViewModelProtocol {
     let state = Observable<ViewState<OrderModel>>(.idle)
     let event: Observable<CartEvent?> = Observable(nil)
+    let orderId: String
     var currentSortOption: CartSortOption
     
-    private let orderId: String
     private let orderService: CartServiceProtocol
     private let sortService: CartSortOptionServiceProtocol
     
@@ -85,6 +86,7 @@ final class CartViewModel: CartViewModelProtocol {
             case .success:
                 fetchOrder()
             case .failure(let error):
+                print(error)
                 // TODO добавить обработку ошибки
             }
         }

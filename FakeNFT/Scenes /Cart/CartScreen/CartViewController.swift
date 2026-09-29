@@ -57,11 +57,17 @@ final class CartViewController: UIViewController, LoadingView {
         viewModel.fetchOrder()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        viewModel.fetchOrder()
+    }
+    
     // MARK: - Private methods
     private func setupUI() {
         setupNavBar()
         setupView()
         setupTableView()
+        setupCheckoutBottomView()
         setupViewModel()
     }
     
@@ -85,13 +91,6 @@ final class CartViewController: UIViewController, LoadingView {
         view.addSubview(tableView)
         view.addSubview(checkoutView)
         view.addSubview(emptyView)
-        
-        checkoutView.onCheckoutButtonTapped = { [weak self] in
-            guard let self else { return }
-            
-            let paymentViewController = paymentAssembly.build()
-            navigationController?.pushViewController(paymentViewController, animated: true)
-        }
         
         activityIndicator.constraintCenters(to: view)
         NSLayoutConstraint.activate([
@@ -125,6 +124,17 @@ final class CartViewController: UIViewController, LoadingView {
         viewModel.event.bindListener { [weak self] event in
             guard let self, let event else { return }
             listenEvent(event)
+        }
+    }
+    
+    private func setupCheckoutBottomView() {
+        checkoutView.onCheckoutButtonTapped = { [weak self] in
+            guard let self else { return }
+            
+            let paymentViewController = paymentAssembly.build(orderId: viewModel.orderId)
+            paymentViewController.hidesBottomBarWhenPushed = true
+            
+            navigationController?.pushViewController(paymentViewController, animated: true)
         }
     }
     
