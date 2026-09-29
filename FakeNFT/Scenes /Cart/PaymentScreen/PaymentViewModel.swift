@@ -72,7 +72,7 @@ final class PaymentViewModel: PaymentViewModelProtocol {
             case .success:
                 updateOrder()
             case .failure(let error):
-                paymentState.value = .failure(error)
+                onMakePaymentError(error)
             }
         }
     }
@@ -85,9 +85,13 @@ final class PaymentViewModel: PaymentViewModelProtocol {
             case .success:
                 paymentState.value = .success(())
             case .failure(let error):
-                paymentState.value = .failure(error)
+                onMakePaymentError(error)
             }
         }
     }
-
+    
+    private func onMakePaymentError(_ error: Error) {
+        AppDelegate.logger.error("Ошибка при оплате заказа", metadata: ["error": "\(error)"])
+        paymentState.value = .failure(error)
+    }
 }

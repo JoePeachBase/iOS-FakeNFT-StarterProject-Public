@@ -13,6 +13,7 @@ enum CartEvent {
 
 protocol CartViewModelProtocol {
     var state: Observable<ViewState<OrderModel>> { get }
+    var deleteNftState: Observable<ViewState<Void>> { get }
     var event: Observable<CartEvent?> { get }
     var nfts: [NftModel] { get }
     var totalCountText: String { get }
@@ -27,6 +28,7 @@ protocol CartViewModelProtocol {
 
 final class CartViewModel: CartViewModelProtocol {
     let state = Observable<ViewState<OrderModel>>(.idle)
+    let deleteNftState = Observable<ViewState<Void>>(.idle)
     let event: Observable<CartEvent?> = Observable(nil)
     let orderId: String
     var currentSortOption: CartSortOption
@@ -69,12 +71,14 @@ final class CartViewModel: CartViewModelProtocol {
                 state.value = .success(order)
                 event.value = .dataLoaded
             case .failure(let error):
+                AppDelegate.logger.error("Ошибка при загрузке заказа", metadata: ["error": "\(error)"])
                 state.value = .failure(error)
             }
         }
     }
     
     func deleteNft(with id: String) {
+        deleteNftState.value = .loading
         let updatedNftIds = nfts
             .filter { $0.id != id }
             .map { $0.id }
@@ -84,10 +88,11 @@ final class CartViewModel: CartViewModelProtocol {
             
             switch result {
             case .success:
+                deleteNftState.value = .success(())
                 fetchOrder()
             case .failure(let error):
-                print(error)
-                // TODO добавить обработку ошибки
+                AppDelegate.logger.error("Ошибка при удалении NFT", metadata: ["error": "\(error)"])
+                deleteNftState.value = .failure(error)
             }
         }
     }

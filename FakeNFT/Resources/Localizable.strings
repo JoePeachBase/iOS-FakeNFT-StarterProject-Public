@@ -11,6 +11,7 @@
 "Error.parsing" = "Не удалось получить данные";
 "Error.repeat" = "Повторить";
 "Error.title" = "Ошибка";
+"Error.ok" = "Ок";
 
 // MARK: - Cart
 "Tab.cart" = "Корзина";

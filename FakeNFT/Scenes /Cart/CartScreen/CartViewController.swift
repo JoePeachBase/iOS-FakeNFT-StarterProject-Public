@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class CartViewController: UIViewController, LoadingView {
+final class CartViewController: UIViewController, LoadingView, ErrorView {
     lazy var activityIndicator = UIActivityIndicatorView()
     
     private let emptyView: EmptyView = {
@@ -121,6 +121,9 @@ final class CartViewController: UIViewController, LoadingView {
         viewModel.state.bindListener { [weak self] state in
             self?.listenState(state)
         }
+        viewModel.deleteNftState.bindListener { [weak self] state in
+            self?.listenDeletionState(state)
+        }
         viewModel.event.bindListener { [weak self] event in
             guard let self, let event else { return }
             listenEvent(event)
@@ -141,6 +144,7 @@ final class CartViewController: UIViewController, LoadingView {
     private func listenState(_ state: ViewState<OrderModel>) {
         let shouldShowContent = state.isSuccess && !state.isEmpty
         
+        toggleLoading(state)
         tableView.isHidden = !shouldShowContent
         checkoutView.isHidden = !shouldShowContent
         emptyView.isHidden = !state.isEmpty
@@ -148,10 +152,24 @@ final class CartViewController: UIViewController, LoadingView {
         
         updateCheckoutBottomView()
         
-        if state.isLoading {
-            showLoading()
-        } else {
-            hideLoading()
+        if case .failure(let error) = state {
+            handleError(error) { [weak self] in
+                self?.viewModel.fetchOrder()
+            }
+        }
+    }
+    
+    private func listenDeletionState(_ state: ViewState<Void>) {
+        let shouldShowContent = state.isSuccess
+        
+        toggleLoading(state)
+        tableView.isHidden = !shouldShowContent
+        checkoutView.isHidden = !shouldShowContent
+        
+        updateCheckoutBottomView()
+        
+        if case .failure(let error) = state {
+            handleErrorWithoutRetry(error)
         }
     }
     
@@ -212,6 +230,32 @@ final class CartViewController: UIViewController, LoadingView {
             countText: viewModel.totalCountText,
             priceText: viewModel.totalSumText
         )
+    }
+    
+    private func toggleLoading<T>(_ state: ViewState<T>) {
+        if state.isLoading {
+            showLoading()
+        } else {
+            hideLoading()
+        }
+    }
+    
+    private func handleError(_ error: Error, action: @escaping () -> Void) {
+        let model = ErrorModel(
+            message: error.localizedDescription,
+            actionText: NSLocalizedString("Error.repeat", comment: ""),
+            action: action
+        )
+        showError(model)
+    }
+    
+    private func handleErrorWithoutRetry(_ error: Error) {
+        let model = ErrorModel(
+            message: error.localizedDescription,
+            actionText: NSLocalizedString("Error.ok", comment: ""),
+            action: {}
+        )
+        showError(model)
     }
 }
 
