@@ -97,10 +97,14 @@ final class PaymentViewController: UIViewController, LoadingView {
                 collectionView.bottomAnchor
                     .constraint(equalTo: paymentBottomView.topAnchor),
                 
-                successPaymentView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-                successPaymentView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-                successPaymentView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-                successPaymentView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+                successPaymentView.topAnchor
+                    .constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+                successPaymentView.leadingAnchor
+                    .constraint(equalTo: view.leadingAnchor),
+                successPaymentView.trailingAnchor
+                    .constraint(equalTo: view.trailingAnchor),
+                successPaymentView.bottomAnchor
+                    .constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
                 
                 paymentBottomView.leadingAnchor
                     .constraint(equalTo: view.leadingAnchor, constant: 16),
@@ -131,6 +135,9 @@ final class PaymentViewController: UIViewController, LoadingView {
             let webViewVC = WebViewController(url: url)
             self?.navigationController?
                 .pushViewController(webViewVC, animated: true)
+        }
+        paymentBottomView.onPaymentButtonTap = { [weak self] in
+            self?.viewModel.makePayment()
         }
     }
     
@@ -185,7 +192,8 @@ extension PaymentViewController: UICollectionViewDataSource {
             .configure(
                 imageURL: currency.imageURL,
                 title: currency.title,
-                subtitle: currency.subtitle
+                subtitle: currency.subtitle,
+                isSelected: currency.id == viewModel.selectedCurrencyId
             )
         
         return cell
@@ -196,7 +204,38 @@ extension PaymentViewController: UICollectionViewDataSource {
 extension PaymentViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let availableWidth = collectionView.frame.width - collectionViewParams.paddingWidth
-        let cellWidth =  availableWidth / CGFloat(collectionViewParams.columnCount)
+        let cellWidth =  availableWidth / CGFloat(
+            collectionViewParams.columnCount
+        )
         return CGSize(width: cellWidth, height: 48)
+    }
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        didSelectItemAt indexPath: IndexPath
+    ) {
+        let previousSelectedIndex = viewModel.currencies.firstIndex { previousCurrency in
+            previousCurrency.id == viewModel.selectedCurrencyId
+        }
+        
+        let currency = viewModel.currencies[indexPath.row]
+        viewModel.onCurrencyTap(with: currency.id)
+        
+        if let previousIndex = previousSelectedIndex {
+            let previousIndexPath = IndexPath(row: previousIndex, section: 0)
+
+            if let previousCell = getCurrencyCell(at: previousIndexPath) {
+                previousCell.configureCellBorder(isVisible: false)
+            }
+        }
+        
+        if let currentCell = getCurrencyCell(at: indexPath) {
+            let isSelected = currency.id == viewModel.selectedCurrencyId
+            currentCell.configureCellBorder(isVisible: isSelected)
+        }
+    }
+    
+    private func getCurrencyCell(at indexPath: IndexPath) -> CurrencyCell? {
+        collectionView.cellForItem(at: indexPath) as? CurrencyCell
     }
 }

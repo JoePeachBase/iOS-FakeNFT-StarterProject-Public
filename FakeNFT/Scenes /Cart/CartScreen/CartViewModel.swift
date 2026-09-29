@@ -29,6 +29,7 @@ final class CartViewModel: CartViewModelProtocol {
     let event: Observable<CartEvent?> = Observable(nil)
     var currentSortOption: CartSortOption
     
+    private let orderId: String
     private let orderService: CartOrderServiceProtocol
     private let sortService: CartSortOptionServiceProtocol
     
@@ -46,7 +47,12 @@ final class CartViewModel: CartViewModelProtocol {
         return "\(totalSum) ETH"
     }
     
-    init(orderService: CartOrderServiceProtocol, sortService: CartSortOptionServiceProtocol) {
+    init(
+        orderId: String,
+        orderService: CartOrderServiceProtocol,
+        sortService: CartSortOptionServiceProtocol
+    ) {
+        self.orderId = orderId
         self.orderService = orderService
         self.sortService = sortService
         self.currentSortOption = sortService.loadSortOption()
@@ -54,7 +60,7 @@ final class CartViewModel: CartViewModelProtocol {
     
     func fetchOrder() {
         state.value = .loading
-        orderService.fetchOrder(id: "1") { [weak self] result in
+        orderService.fetchOrder(id: orderId) { [weak self] result in
             guard let self else { return }
             
             switch result {

@@ -8,12 +8,16 @@
 protocol PaymentViewModelProtocol {
     var state: Observable<ViewState<[CurrencyModel]>> { get }
     var currencies: [CurrencyModel] { get }
+    var selectedCurrencyId: String? { get }
     
     func fetchCurrencies()
+    func onCurrencyTap(with id: String)
+    func makePayment()
 }
 
 final class PaymentViewModel: PaymentViewModelProtocol {
     let state = Observable<ViewState<[CurrencyModel]>>(.idle)
+    var selectedCurrencyId: String?
     private let service: CurrencyServiceProtocol
     
     var currencies: [CurrencyModel] {
@@ -37,5 +41,17 @@ final class PaymentViewModel: PaymentViewModelProtocol {
                 state.value = .failure(error)
             }
         }
+    }
+    
+    func onCurrencyTap(with id: String) {
+        if id == selectedCurrencyId {
+            selectedCurrencyId = nil
+        } else {
+            selectedCurrencyId = id
+        }
+    }
+    
+    func makePayment() {
+        
     }
 }

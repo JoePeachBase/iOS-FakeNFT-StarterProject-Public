@@ -9,6 +9,8 @@ import UIKit
 
 final class PaymentBottomView: UIView {
     var onUserAgreementTap: ((URL) -> Void)?
+    var onPaymentButtonTap: (() -> Void)?
+    
     private let agreementTextView: UITextView = {
         let textView = UITextView()
         textView.isEditable = false
@@ -27,7 +29,11 @@ final class PaymentBottomView: UIView {
         return textView
     }()
     
-    private let paymentButton: UIButton = {
+    private lazy var paymentButton: UIButton = {
+        let action = UIAction { [weak self] _ in
+            self?.onPaymentButtonTap?()
+        }
+        
         let title = NSLocalizedString("Payment.button.title", comment: "")
         var configuration = UIButton.Configuration.filled()
         configuration.background.cornerRadius = 16
@@ -38,7 +44,10 @@ final class PaymentBottomView: UIView {
         container.font = .systemFont(ofSize: 17, weight: .bold)
         configuration.attributedTitle = AttributedString(title, attributes: container)
         
-        let button = UIButton(configuration: configuration)
+        let button = UIButton(
+            configuration: configuration,
+            primaryAction: action
+        )
         
         button.translatesAutoresizingMaskIntoConstraints = false
         return button

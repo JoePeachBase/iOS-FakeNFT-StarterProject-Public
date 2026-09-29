@@ -29,6 +29,9 @@ final class CheckoutBottomView: UIView {
     
     private let totalPriceLabel: UILabel = {
         let label = UILabel()
+        label.numberOfLines = 1
+        label.adjustsFontSizeToFitWidth = true
+        label.minimumScaleFactor = 0.8
         label.font = .systemFont(ofSize: 17, weight: .bold)
         label.textColor = .yaGreenUniversal
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -78,13 +81,12 @@ final class CheckoutBottomView: UIView {
             
             textStackView.centerYAnchor.constraint(equalTo: centerYAnchor),
             textStackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
+            textStackView.trailingAnchor.constraint(equalTo: checkoutButton.leadingAnchor, constant: -16),
             
             checkoutButton.centerYAnchor.constraint(equalTo: centerYAnchor),
-            checkoutButton.leadingAnchor.constraint(equalTo: textStackView.trailingAnchor, constant: 24),
             checkoutButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
-            
-            checkoutButton.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.7),
-            checkoutButton.heightAnchor.constraint(equalToConstant: 44)
+            checkoutButton.heightAnchor.constraint(equalToConstant: 44),
+            checkoutButton.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.6)
         ])
     }
     

@@ -42,6 +42,8 @@ final class CurrencyCell: UICollectionViewCell, ReuseIdentifying {
     override func prepareForReuse() {
         super.prepareForReuse()
         imageView.kf.cancelDownloadTask()
+        contentView.layer.borderColor = nil
+        contentView.layer.borderWidth = 0
     }
     
     @available(*, unavailable)
@@ -49,18 +51,35 @@ final class CurrencyCell: UICollectionViewCell, ReuseIdentifying {
         nil
     }
     
-    func configure(imageURL: String, title: String, subtitle: String) {
+    func configure(
+        imageURL: String,
+        title: String,
+        subtitle: String,
+        isSelected: Bool
+    ) {
         imageView.kf.setImage(
             with: URL(string: imageURL),
             placeholder: UIImage(resource: .deleteAlert)
         )
         titleLabel.text = title
         subtitleLabel.text = subtitle
+        configureCellBorder(isVisible: isSelected)
+    }
+    
+    func configureCellBorder(isVisible: Bool) {
+        if isVisible {
+            contentView.layer.borderColor = UIColor.segmentActive.cgColor
+            contentView.layer.borderWidth = 1.0
+        } else {
+            contentView.layer.borderColor = nil
+            contentView.layer.borderWidth = 0
+        }
     }
     
     private func setupView() {
         backgroundColor = .segmentInactive
-        layer.cornerRadius = 12
+        contentView.layer.cornerRadius = 12
+        contentView.clipsToBounds = true
         
         contentView.addSubview(imageView)
         contentView.addSubview(titleLabel)

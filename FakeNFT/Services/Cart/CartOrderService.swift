@@ -60,9 +60,9 @@ final class CartOrderService: CartOrderServiceProtocol {
             group.enter()
             
             nftService.loadNft(id: id) { [weak self] result in
-                guard let self = self else { return }
-                
                 defer { group.leave() }
+                
+                guard let self = self else { return }
                 
                 switch result {
                 case .success(let nft):
