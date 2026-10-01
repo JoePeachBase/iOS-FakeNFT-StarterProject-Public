@@ -289,7 +289,8 @@ final class CollectionDetailViewModel {
     }
     
     private func loadOrder(completion: @escaping (Result<Void, Error>) -> Void) {
-        cartService.fetchOrder(id: "1") { [weak self] result in
+        let orderId = "1"
+        cartService.fetchOrder(id: orderId) { [weak self] result in
             guard let self else { return }
             
             switch result {

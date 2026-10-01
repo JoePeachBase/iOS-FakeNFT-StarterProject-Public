@@ -64,7 +64,7 @@ final class CartDeleteItemMenuViewController: UIViewController {
             onDeleteButtonTap?()
             dismiss(animated: true)
         }
-        let title = NSLocalizedString("Cart.delete.cancel", comment: "")
+        let title = NSLocalizedString("Cart.delete.confirm", comment: "")
         let button = UIButton(type: .system, primaryAction: action)
         button.setTitle(title, for: .normal)
         button.backgroundColor = .segmentActive
@@ -79,7 +79,7 @@ final class CartDeleteItemMenuViewController: UIViewController {
         let action = UIAction { [weak self] _ in
             self?.dismiss(animated: true)
         }
-        let title = NSLocalizedString("Cart.delete.confirm", comment: "")
+        let title = NSLocalizedString("Cart.delete.cancel", comment: "")
         let button = UIButton(type: .system, primaryAction: action)
         button.setTitle(title, for: .normal)
         button.backgroundColor = .segmentActive

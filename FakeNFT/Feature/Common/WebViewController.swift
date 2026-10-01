@@ -8,12 +8,12 @@
 import UIKit
 import WebKit
 
-final class WebViewController1: UIViewController {
-
+final class WebViewController: UIViewController {
+    
     private let url: URL
     
     private var progressObservation: NSKeyValueObservation?
-
+    
     private lazy var webView: WKWebView = {
         let webView = WKWebView()
         webView.translatesAutoresizingMaskIntoConstraints = false
@@ -34,17 +34,17 @@ final class WebViewController1: UIViewController {
         button.addTarget(self, action: #selector(didTapBackButton), for: .touchUpInside)
         return button
     }()
-
+    
     init(url: URL) {
         self.url = url
         super.init(nibName: nil, bundle: nil)
     }
-
+    
     @available(*, unavailable)
     required init?(coder: NSCoder) {
         nil
     }
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -63,7 +63,7 @@ final class WebViewController1: UIViewController {
     private func setupLayoutAndConstraints() {
         view.addSubview(webView)
         view.addSubview(progressView)
-
+        
         NSLayoutConstraint.activate([
             webView.topAnchor.constraint(equalTo: view.topAnchor),
             webView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -83,16 +83,16 @@ final class WebViewController1: UIViewController {
             progressView.setProgress(Float(webView.estimatedProgress),animated: true)
             
             if webView.estimatedProgress >= 1 { UIView.animate(
-                    withDuration: 0.25,
-                    animations: {
-                        self.progressView.alpha = 0
-                    },
-                    completion: { _ in
-                        self.progressView.isHidden = true
-                        self.progressView.progress = 0
-                        self.progressView.alpha = 1
-                    }
-                )
+                withDuration: 0.25,
+                animations: {
+                    self.progressView.alpha = 0
+                },
+                completion: { _ in
+                    self.progressView.isHidden = true
+                    self.progressView.progress = 0
+                    self.progressView.alpha = 1
+                }
+            )
             } else {
                 progressView.isHidden = false
                 progressView.alpha = 1

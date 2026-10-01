@@ -1,7 +1,6 @@
 // MARK: - Catalog
 
 "Tab.catalog" = "Каталог";
-"Catalog.openNft" = "Открыть Nft";
 
 // MARK: - Errors
 
@@ -11,13 +10,11 @@
 "Error.parsing" = "Не удалось получить данные";
 "Error.repeat" = "Повторить";
 "Error.title" = "Ошибка";
-<<<<<<< HEAD
 "Catalog.sorting.title" = "Сортировка";
 "Catalog.sorting.byName" = "По названию";
 "Catalog.sorting.byCount" = "По количеству NFT";
 "Common.close" = "Закрыть";
 "Collection.author.title" = "Автор коллекции:";
-=======
 "Error.ok" = "Ок";
 
 // MARK: - Cart
@@ -49,4 +46,3 @@
 
 "Payment.success.title" = "Успех! Оплата прошла,\nпоздравляем с покупкой!";
 "Payment.success.button" = "Вернуться в корзину";
->>>>>>> 05b0345 (feat: Реализовал эпик Корзина (+1 squashed commit))
