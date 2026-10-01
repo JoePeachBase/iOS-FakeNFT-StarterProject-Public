@@ -18,7 +18,7 @@ final class ServicesAssembly {
         )
     }
     
-    var orderService: CartServiceProtocol {
+    var cartService: CartServiceProtocol {
         CartService(
             networkClient: networkClient,
             nftService: nftService

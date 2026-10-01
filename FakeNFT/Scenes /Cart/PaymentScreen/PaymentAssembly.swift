@@ -17,7 +17,7 @@ final class PaymentAssembly {
     func build(orderId: String) -> UIViewController {
         let viewModel = PaymentViewModel(
             orderId: orderId,
-            cartService: servicesAssembler.orderService,
+            cartService: servicesAssembler.cartService,
             currencyService: servicesAssembler.currencyService
         )
         return PaymentViewController(viewModel)

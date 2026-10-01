@@ -32,6 +32,7 @@ final class CartViewController: UIViewController, LoadingView, ErrorView {
     }()
     private var viewModel: CartViewModelProtocol
     private var paymentAssembly: PaymentAssembly
+    private var pendingDeletionId: String?
     
     // MARK: - Init
     init(
@@ -54,7 +55,6 @@ final class CartViewController: UIViewController, LoadingView, ErrorView {
         
         setupUI()
         updateCheckoutBottomView()
-        viewModel.fetchOrder()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -160,16 +160,21 @@ final class CartViewController: UIViewController, LoadingView, ErrorView {
     }
     
     private func listenDeletionState(_ state: ViewState<Void>) {
-        let shouldShowContent = state.isSuccess
-        
         toggleLoading(state)
-        tableView.isHidden = !shouldShowContent
-        checkoutView.isHidden = !shouldShowContent
         
-        updateCheckoutBottomView()
-        
-        if case .failure(let error) = state {
-            handleErrorWithoutRetry(error)
+        switch state {
+        case .success:
+            pendingDeletionId = nil
+            updateCheckoutBottomView()
+        case .failure(let error):
+            handleError(error) { [weak self] in
+                guard let self else { return }
+                if let pendingDeletionId {
+                    viewModel.deleteNft(with: pendingDeletionId)
+                }
+            }
+        default:
+            break
         }
     }
     
@@ -222,6 +227,7 @@ final class CartViewController: UIViewController, LoadingView, ErrorView {
     private func deleteNft(at indexPath: IndexPath) {
         guard indexPath.row < viewModel.nfts.count else { return }
         let nftToDelete = viewModel.nfts[indexPath.row]
+        pendingDeletionId = nftToDelete.id
         viewModel.deleteNft(with: nftToDelete.id)
     }
     
@@ -245,15 +251,6 @@ final class CartViewController: UIViewController, LoadingView, ErrorView {
             message: error.localizedDescription,
             actionText: NSLocalizedString("Error.repeat", comment: ""),
             action: action
-        )
-        showError(model)
-    }
-    
-    private func handleErrorWithoutRetry(_ error: Error) {
-        let model = ErrorModel(
-            message: error.localizedDescription,
-            actionText: NSLocalizedString("Error.ok", comment: ""),
-            action: {}
         )
         showError(model)
     }

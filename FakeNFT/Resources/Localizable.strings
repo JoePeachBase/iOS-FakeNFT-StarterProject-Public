@@ -19,6 +19,8 @@
 "Cart.item.price.subtitle" = "Цена";
 "Cart.button.payment.title" = "К оплате";
 "Cart.menu.delete.title" = "Вы уверены, что хотите\nудалить объект из корзины?";
+"Cart.delete.confirm" = "Удалить";
+"Cart.delete.cancel" = "Отмена";
 
 // MARK: - Cart Filters
 

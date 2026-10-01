@@ -20,14 +20,15 @@ final class PaymentViewModel: PaymentViewModelProtocol {
     let state = Observable<ViewState<[CurrencyModel]>>(.idle)
     let paymentState = Observable<ViewState<Void>>(.idle)
     var selectedCurrencyId: String?
-    private let orderId: String
-    private let cartService: CartServiceProtocol
-    private let currencyService: CurrencyServiceProtocol
-    
     var currencies: [CurrencyModel] {
         guard case .success(let currencies) = state.value else { return [] }
         return currencies
     }
+    
+    private let orderId: String
+    private let cartService: CartServiceProtocol
+    private let currencyService: CurrencyServiceProtocol
+    private var isPaymentCompleted = false
     
     init(
         orderId: String,
@@ -48,6 +49,7 @@ final class PaymentViewModel: PaymentViewModelProtocol {
             case .success(let model):
                 state.value = .success(model)
             case .failure(let error):
+                AppDelegate.logger.error("Ошибка при запросе валют", metadata: ["error": "\(error)"])
                 state.value = .failure(error)
             }
         }
@@ -64,21 +66,29 @@ final class PaymentViewModel: PaymentViewModelProtocol {
     func makePayment() {
         guard let selectedCurrencyId else { return }
         
+        if isPaymentCompleted {
+            completeOrder()
+            return
+        }
+        
         paymentState.value = .loading
+        
         cartService.makePayment(id: orderId, currencyId: selectedCurrencyId) { [weak self] result in
             guard let self else { return }
             
             switch result {
             case .success:
-                updateOrder()
+                isPaymentCompleted = true
+                completeOrder()
             case .failure(let error):
                 onMakePaymentError(error)
             }
         }
     }
     
-    private func updateOrder() {
-        cartService.updateOrder(id: orderId, nfts: []) { [weak self] result in
+    private func completeOrder() {
+        let nfts: [String] = []
+        cartService.updateOrder(id: orderId, nfts: nfts) { [weak self] result in
             guard let self else { return }
             
             switch result {

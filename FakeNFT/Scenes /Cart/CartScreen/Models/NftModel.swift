@@ -14,7 +14,9 @@ struct NftModel {
     let rating: Int
     let formattedPrice: String
     let price: Double
-    
+}
+
+extension NftModel {
     init(model: Nft) {
         id = model.id
         title = model.name

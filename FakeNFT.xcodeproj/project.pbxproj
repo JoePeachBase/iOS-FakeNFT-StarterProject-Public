@@ -51,6 +51,9 @@
 		285708A93069A58100940F06 /* PaymentAssembly.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285708A83069A57C00940F06 /* PaymentAssembly.swift */; };
 		28570932306C355200940F06 /* Payment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28570931306C355000940F06 /* Payment.swift */; };
 		28570952306D44A000940F06 /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = 28570951306D44A000940F06 /* Logging */; };
+		2857097C306E784A00940F06 /* CartViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2857097B306E784800940F06 /* CartViewModelTests.swift */; };
+		2857097E306E79E300940F06 /* CartServiceMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2857097D306E79DA00940F06 /* CartServiceMock.swift */; };
+		28570980306E7AA600940F06 /* CartSortOptionServiceMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2857097F306E7AA000940F06 /* CartSortOptionServiceMock.swift */; };
 		3F478ECF29DB474E00F6D39E /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F478ECE29DB474E00F6D39E /* Colors.swift */; };
 		3F478ED129DB476500F6D39E /* Fonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F478ED029DB476500F6D39E /* Fonts.swift */; };
 		3F603CCD29DB4A53000C43D7 /* ProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = 3F603CCC29DB4A53000C43D7 /* ProgressHUD */; };
@@ -137,6 +140,9 @@
 		285708A630699F5900940F06 /* Currency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Currency.swift; sourceTree = "<group>"; };
 		285708A83069A57C00940F06 /* PaymentAssembly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentAssembly.swift; sourceTree = "<group>"; };
 		28570931306C355000940F06 /* Payment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Payment.swift; sourceTree = "<group>"; };
+		2857097B306E784800940F06 /* CartViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartViewModelTests.swift; sourceTree = "<group>"; };
+		2857097D306E79DA00940F06 /* CartServiceMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartServiceMock.swift; sourceTree = "<group>"; };
+		2857097F306E7AA000940F06 /* CartSortOptionServiceMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartSortOptionServiceMock.swift; sourceTree = "<group>"; };
 		3F478ECE29DB474E00F6D39E /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
 		3F478ED029DB476500F6D39E /* Fonts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fonts.swift; sourceTree = "<group>"; };
 		3F68069329CBBAF100B4F915 /* FakeNFT.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FakeNFT.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -368,6 +374,24 @@
 			path = Model;
 			sourceTree = "<group>";
 		};
+		28570979306E783400940F06 /* Scenes */ = {
+			isa = PBXGroup;
+			children = (
+				2857097A306E783F00940F06 /* Cart */,
+			);
+			path = Scenes;
+			sourceTree = "<group>";
+		};
+		2857097A306E783F00940F06 /* Cart */ = {
+			isa = PBXGroup;
+			children = (
+				2857097F306E7AA000940F06 /* CartSortOptionServiceMock.swift */,
+				2857097D306E79DA00940F06 /* CartServiceMock.swift */,
+				2857097B306E784800940F06 /* CartViewModelTests.swift */,
+			);
+			path = Cart;
+			sourceTree = "<group>";
+		};
 		3F478ECD29DB473000F6D39E /* DesignSystem */ = {
 			isa = PBXGroup;
 			children = (
@@ -417,6 +441,7 @@
 		3F6806AC29CBBAF200B4F915 /* FakeNFTTests */ = {
 			isa = PBXGroup;
 			children = (
+				28570979306E783400940F06 /* Scenes */,
 				3F6806AD29CBBAF200B4F915 /* ExampleUnitTests.swift */,
 			);
 			path = FakeNFTTests;
@@ -748,6 +773,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				28570980306E7AA600940F06 /* CartSortOptionServiceMock.swift in Sources */,
+				2857097E306E79E300940F06 /* CartServiceMock.swift in Sources */,
+				2857097C306E784A00940F06 /* CartViewModelTests.swift in Sources */,
 				3F6806AE29CBBAF200B4F915 /* ExampleUnitTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -979,7 +1007,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.practicum.FakeNFTTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -998,7 +1026,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.practicum.FakeNFTTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";

@@ -33,7 +33,7 @@ final class CartViewModel: CartViewModelProtocol {
     let orderId: String
     var currentSortOption: CartSortOption
     
-    private let orderService: CartServiceProtocol
+    private let cartService: CartServiceProtocol
     private let sortService: CartSortOptionServiceProtocol
     
     var nfts: [NftModel] {
@@ -52,18 +52,18 @@ final class CartViewModel: CartViewModelProtocol {
     
     init(
         orderId: String,
-        orderService: CartServiceProtocol,
+        cartService: CartServiceProtocol,
         sortService: CartSortOptionServiceProtocol
     ) {
         self.orderId = orderId
-        self.orderService = orderService
+        self.cartService = cartService
         self.sortService = sortService
         self.currentSortOption = sortService.loadSortOption()
     }
     
     func fetchOrder() {
         state.value = .loading
-        orderService.fetchOrder(id: orderId) { [weak self] result in
+        cartService.fetchOrder(id: orderId) { [weak self] result in
             guard let self else { return }
             
             switch result {
@@ -71,7 +71,7 @@ final class CartViewModel: CartViewModelProtocol {
                 state.value = .success(order)
                 event.value = .dataLoaded
             case .failure(let error):
-                AppDelegate.logger.error("Ошибка при загрузке заказа", metadata: ["error": "\(error)"])
+                AppDelegate.logger.error("Ошибка при запросе заказа", metadata: ["error": "\(error)"])
                 state.value = .failure(error)
             }
         }
@@ -83,7 +83,7 @@ final class CartViewModel: CartViewModelProtocol {
             .filter { $0.id != id }
             .map { $0.id }
         
-        orderService.updateOrder(id: orderId, nfts: updatedNftIds) { [weak self] result in
+        cartService.updateOrder(id: orderId, nfts: updatedNftIds) { [weak self] result in
             guard let self else { return }
             
             switch result {

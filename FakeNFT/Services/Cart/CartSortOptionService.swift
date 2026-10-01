@@ -8,7 +8,7 @@
 import Foundation
 
 protocol CartSortOptionServiceProtocol: AnyObject {
-    func saveSortOption(_ filter: CartSortOption)
+    func saveSortOption(_ option: CartSortOption)
     func loadSortOption() -> CartSortOption
 }
 

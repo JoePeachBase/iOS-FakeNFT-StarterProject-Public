@@ -64,8 +64,9 @@ final class CartDeleteItemMenuViewController: UIViewController {
             onDeleteButtonTap?()
             dismiss(animated: true)
         }
+        let title = NSLocalizedString("Cart.delete.cancel", comment: "")
         let button = UIButton(type: .system, primaryAction: action)
-        button.setTitle("Удалить", for: .normal)
+        button.setTitle(title, for: .normal)
         button.backgroundColor = .segmentActive
         button.setTitleColor(.yaRedUniversal, for: .normal)
         button.layer.cornerRadius = 12
@@ -75,9 +76,12 @@ final class CartDeleteItemMenuViewController: UIViewController {
     }()
     
     private lazy var cancelButton: UIButton = {
-        let action = UIAction { [weak self] _ in self?.dismiss(animated: true) }
+        let action = UIAction { [weak self] _ in
+            self?.dismiss(animated: true)
+        }
+        let title = NSLocalizedString("Cart.delete.confirm", comment: "")
         let button = UIButton(type: .system, primaryAction: action)
-        button.setTitle("Отмена", for: .normal)
+        button.setTitle(title, for: .normal)
         button.backgroundColor = .segmentActive
         button.setTitleColor(.white, for: .normal)
         button.layer.cornerRadius = 12

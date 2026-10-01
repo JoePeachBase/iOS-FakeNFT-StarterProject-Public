@@ -22,7 +22,7 @@ final class CartAssembly {
     func build() -> UIViewController {
         let viewModel = CartViewModel(
             orderId: "1",
-            orderService: servicesAssembler.orderService,
+            cartService: servicesAssembler.cartService,
             sortService: servicesAssembler.cartSortService
         )
         return CartViewController(viewModel: viewModel, paymentAssembly: paymentAssembly)

@@ -71,7 +71,6 @@ final class CartService: CartServiceProtocol {
             case .success:
                 completion(.success(()))
             case .failure(let error):
-                print(error.localizedDescription)
                 completion(.failure(error))
             }
         }
