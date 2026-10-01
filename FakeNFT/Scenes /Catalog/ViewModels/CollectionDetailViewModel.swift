@@ -35,7 +35,7 @@ final class CollectionDetailViewModel {
     private let collection: NFTCollection
     private let nftService: NftService
     private let profileService: ProfileService
-    private let orderService: OrderService
+    private let cartService: CartServiceProtocol
     private let loadSyncQueueLabel = "collectionDetail.load.sync"
     
     private(set) var state: CollectionDetailState = .initial {
@@ -54,12 +54,12 @@ final class CollectionDetailViewModel {
         collection: NFTCollection,
         nftService: NftService,
         profileService: ProfileService,
-        orderService: OrderService
+        cartService: CartServiceProtocol
     ) {
         self.collection = collection
         self.nftService = nftService
         self.profileService = profileService
-        self.orderService = orderService
+        self.cartService = cartService
     }
     
     func loadNfts() {
@@ -112,7 +112,7 @@ final class CollectionDetailViewModel {
             switch result {
             case .success:
                 group.leave()
-
+                
             case .failure(let error):
                 syncQueue.async {
                     if loadingError == nil {
@@ -158,16 +158,16 @@ final class CollectionDetailViewModel {
     
     func makeActionErrorModel(_ error: Error) -> ErrorModel {
         let message: String
-
+        
         switch error {
         case is NetworkClientError:
             message = NSLocalizedString("Error.network", comment: "")
         default:
             message = NSLocalizedString("Error.unknown", comment: "")
         }
-
+        
         let actionText = NSLocalizedString("Common.close", comment: "")
-
+        
         return ErrorModel(
             message: message,
             actionText: actionText,
@@ -228,28 +228,26 @@ final class CollectionDetailViewModel {
         updatingCartIDs.insert(nftID)
         updateCellModels()
         
-        let request = OrderUpdateRequestModel(nfts: Array(cartIDs))
+        let nfts = Array(cartIDs)
         
-        orderService.updateOrder(request: request) { [weak self] result in
+        cartService.updateOrder(id: "1", nfts: nfts) { [weak self] result in
             guard let self else { return }
             
-            DispatchQueue.main.async {
-                switch result {
-                case .success:
-                    self.updatingCartIDs.remove(nftID)
-                    self.updateCellModels()
-                    
-                case .failure(let error):
-                    if wasInCart {
-                        self.cartIDs.insert(nftID)
-                    } else {
-                        self.cartIDs.remove(nftID)
-                    }
-                    
-                    self.updatingCartIDs.remove(nftID)
-                    self.updateCellModels()
-                    self.onActionError?(error)
+            switch result {
+            case .success:
+                self.updatingCartIDs.remove(nftID)
+                self.updateCellModels()
+                
+            case .failure(let error):
+                if wasInCart {
+                    self.cartIDs.insert(nftID)
+                } else {
+                    self.cartIDs.remove(nftID)
                 }
+                
+                self.updatingCartIDs.remove(nftID)
+                self.updateCellModels()
+                self.onActionError?(error)
             }
         }
     }
@@ -290,15 +288,16 @@ final class CollectionDetailViewModel {
         state = .loaded(cellModels)
     }
     
-    private func loadOrder(completion: @escaping (Result<OrderResponseModel, Error>) -> Void) {
-        orderService.loadOrder { [weak self] result in
+    private func loadOrder(completion: @escaping (Result<Void, Error>) -> Void) {
+        cartService.fetchOrder(id: "1") { [weak self] result in
             guard let self else { return }
-
+            
             switch result {
             case .success(let order):
-                self.cartIDs = Set(order.nfts)
-                completion(.success(order))
-
+                let ids = order.nfts.map { $0.id }
+                self.cartIDs = Set(ids)
+                completion(.success(()))
+                
             case .failure(let error):
                 completion(.failure(error))
             }

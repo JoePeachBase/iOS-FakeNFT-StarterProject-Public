@@ -18,33 +18,25 @@ final class TabBarController: UITabBarController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-<<<<<<< HEAD
-        let catalogViewModel = CatalogViewModel(collectionService: servicesAssembly.collectionService)
-        let collectionDetailAssembly = CollectionDetailAssembly(serviceAssembly: servicesAssembly)
-        let catalogController = CatalogViewController(viewModel: catalogViewModel, collectionDetailAssembly: collectionDetailAssembly)
-        let navigationController = UINavigationController(rootViewController: catalogController)
-        navigationController.tabBarItem = catalogTabBarItem
-
-        viewControllers = [navigationController]
-
+                
         view.backgroundColor = .systemBackground
-=======
+        
         let catalogViewController = getCatalogViewController()
         let cartViewController = getCartViewController()
         
         viewControllers = [catalogViewController, cartViewController]
-        
-        view.backgroundColor = .systemBackground
     }
     
     private func getCatalogViewController() -> UIViewController {
-        let catalogController = TestCatalogViewController(
-            servicesAssembly: servicesAssembly
+        let catalogViewModel = CatalogViewModel(collectionService: servicesAssembly.collectionService)
+        let collectionDetailAssembly = CollectionDetailAssembly(serviceAssembly: servicesAssembly)
+        let catalogViewController = CatalogViewController(
+            viewModel: catalogViewModel,
+            collectionDetailAssembly: collectionDetailAssembly
         )
-        catalogController.tabBarItem = catalogTabBarItem
+        catalogViewController.tabBarItem = catalogTabBarItem
         
-        return catalogController
+        return UINavigationController(rootViewController: catalogViewController)
     }
     
     private func getCartViewController() -> UIViewController {
@@ -54,6 +46,5 @@ final class TabBarController: UITabBarController {
         cartViewController.tabBarItem = cartTabBarItem
         
         return UINavigationController(rootViewController: cartViewController)
->>>>>>> 05b0345 (feat: Реализовал эпик Корзина (+1 squashed commit))
     }
 }

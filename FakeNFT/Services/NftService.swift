@@ -11,24 +11,17 @@ protocol NftService {
 final class NftServiceImpl: NftService {
 
     private let networkClient: NetworkClient
-    private let storage: NftStorage
 
-    init(networkClient: NetworkClient, storage: NftStorage) {
-        self.storage = storage
+    init(networkClient: NetworkClient) {
         self.networkClient = networkClient
     }
 
     func loadNft(id: String, completion: @escaping NftCompletion) {
-        if let nft = storage.getNft(with: id) {
-            completion(.success(nft))
-            return
-        }
 
         let request = NFTRequest(id: id)
-        networkClient.send(request: request, type: Nft.self) { [weak storage] result in
+        networkClient.send(request: request, type: Nft.self) { result in
             switch result {
             case .success(let nft):
-                storage?.saveNft(nft)
                 completion(.success(nft))
             case .failure(let error):
                 completion(.failure(error))
@@ -36,7 +29,6 @@ final class NftServiceImpl: NftService {
         }
     }
     
-<<<<<<< HEAD
     func loadNfts(ids: [String], completion: @escaping NftsCompletion) {
         let group = DispatchGroup()
         let syncQueue = DispatchQueue(label: "nftService.loadNfts.sync")
@@ -74,7 +66,4 @@ final class NftServiceImpl: NftService {
             completion(.success(nfts))
         }
     }
-=======
-    
->>>>>>> 05b0345 (feat: Реализовал эпик Корзина (+1 squashed commit))
 }

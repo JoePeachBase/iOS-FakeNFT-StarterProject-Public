@@ -1,31 +1,23 @@
 final class ServicesAssembly {
 
     private let networkClient: NetworkClient
-    private let nftStorage: NftStorage
 
-    init(
-        networkClient: NetworkClient,
-        nftStorage: NftStorage
-    ) {
+    init(networkClient: NetworkClient) {
         self.networkClient = networkClient
-        self.nftStorage = nftStorage
     }
 
     var nftService: NftService {
-        NftServiceImpl(
-            networkClient: networkClient,
-            storage: nftStorage
-        )
+        NftServiceImpl(networkClient: networkClient)
     }
     
-<<<<<<< HEAD
     var collectionService: CollectionService {
         CollectionServiceImpl(networkClient: networkClient)
     }
     
     var profileService: ProfileService {
         ProfileServiceImpl(networkClient: networkClient)
-=======
+    }
+    
     var cartService: CartServiceProtocol {
         CartService(
             networkClient: networkClient,
@@ -39,6 +31,5 @@ final class ServicesAssembly {
     
     var currencyService: CurrencyServiceProtocol {
         CurrencyService(networkClient: networkClient)
->>>>>>> 05b0345 (feat: Реализовал эпик Корзина (+1 squashed commit))
     }
 }
