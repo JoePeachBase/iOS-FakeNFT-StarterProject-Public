@@ -7,6 +7,21 @@ enum NetworkClientError: Error {
     case parsingError
 }
 
+extension NetworkClientError: LocalizedError {
+    var errorDescription: String? {
+        switch self {
+        case .httpStatusCode(let code):
+            String(format:NSLocalizedString("Error.http", comment: ""), code)
+        case .parsingError:
+            NSLocalizedString("Error.parsing", comment: "")
+        case .urlSessionError:
+            NSLocalizedString("Error.unknown", comment: "")
+        case .urlRequestError:
+            NSLocalizedString("Error.network", comment: "")
+        }
+    }
+}
+
 protocol NetworkClient {
     @discardableResult
     func send(request: NetworkRequest,

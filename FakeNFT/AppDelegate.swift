@@ -1,7 +1,11 @@
+import Logging
 import UIKit
+import Logging
 
 @main
 final class AppDelegate: UIResponder, UIApplicationDelegate {
+    static let logger = Logger(label: "com.billych28.FakeNft")
+
     func application(
         _: UIApplication,
         didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]?
